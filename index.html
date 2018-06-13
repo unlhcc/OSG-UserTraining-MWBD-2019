@@ -1,0 +1,168 @@
+---
+layout: workshop
+root: .
+venue: High-Throughput Computation on the Open Science Grid, RMACC'18 
+address: Boulder, CO
+country: United States
+humandate: August 9, 2018
+humantime: 1:00 pm - 4:30 pm
+startdate: AUG-09-2018
+enddate: AUG-09-2018
+latlng: 40.0013, -105.2634
+registration: https://www.rmacc.org/HPCSymposium
+instructor: ["Lauren Michael, Mats Rynge"]
+helper: ["TBD"]
+contact: user-support@opensciencegrid.org
+---
+
+
+<!--
+    Edit the values in the parameter block above to be appropriate for your bootcamp.
+-->
+
+
+<h2>General Information</h2>
+
+<p>
+The <a href="http://www.opensciencegrid.org">Open Science Grid</a>
+provides a fabric of services to enable
+distributed, high-throughput computing capabilities across the US. In
+general, OSG is organized into VOs (Virtual Organizations) around large
+experiments, but individual PIs and groups too small for the VO model
+can use the hosted services provided by
+<a href="http://osgconnect.net">OSG Connect</a>.
+</p>
+
+<p>
+The format of this tutorial is a mix of lecture and hands-on exercises, so
+please bring your laptop and make sure you have an SSH client installed.
+<p>
+
+<p>
+The goal of this session is to learn how to run and
+scale up workloads, manage your data and also spill over into Amazon
+cloud resources. Topics to include:
+Introduction to the OSG; Job Scheduling with HTCondor; Scaling Up
+Workloads; Managing data
+</p>
+  
+<!-- This block displays the instructors' names if they are available. -->
+{% if page.instructor %}
+<p>
+  <strong>Instructors:</strong>
+  {{page.instructor | join: ', ' %}}
+</p>
+{% endif %}
+
+<!-- This block displays the helpers' names if they are available. -->
+{% if page.helper %}
+<p>
+  <strong>Helpers:</strong>
+  {{page.helper | join: ', ' %}}
+</p>
+{% endif %}
+
+<!--
+    Modify this block to reflect the target audience for your bootcamp.
+    In particular, if it is only open to people from a particular institution,
+    or if specialized prerequisite knowledge is required, please mention that.
+-->
+<!--
+<p>
+  <strong>Who:</strong>
+  The course is aimed at graduate students, post-doctoral researchers and other researchers.
+</p>
+-->
+<!--
+    This block displays the address and links to a map showing directions.
+-->
+<p>
+  <strong>Where:</strong>
+  {{ page.address }}.
+</p>
+
+<!--
+    Modify the block below if there are any special requirements.
+-->
+<p>
+  <strong>Requirements:</strong>
+  Participants must bring a laptop with a few specific software packages installed
+  (see <a href="setup.html">Setup</a>).
+</p>
+
+<!--
+    This block automatically inserts a contact email address if one has been specified for the page.
+    If one hasn't, this block inserts the generic contact address for Software Carpentry.
+-->
+<p>
+  <strong>Contact</strong>:
+  Please mail
+  {% if page.contact %}
+    <a href='mailto:{{page.contact}}'>{{page.contact}}</a>
+  {% else %}
+    <a href='mailto:{{site.contact}}'>{{site.contact}}</a>
+  {% endif %}
+  for more information.
+</p>
+
+<p>
+  <strong>Conference</strong>:
+  <a href="{{page.conference}}">{{page.conference}}</a>
+</p>
+
+
+<hr/>
+
+{% if page.registration %}
+<h2>Registration</h2>
+<p>
+Space is limited for the event. To register,  please <a href="{{page.registration}}"> visit the OSG-AHM registration page </a>.
+</p>
+{% endif %}
+<hr/>
+
+<h2>Schedule</h2>
+<h2> </h2>
+<div class="row-fluid">
+    <h4> High-Throughput Computation on the Open Science Grid and AWS </h4>
+    <h4> March 22, 2018, 9:00 AM - 12:30 AM </h4>
+    <h5>Location: Officers Club, University of Utah, Salt Lake City. </h5>
+    <h5>Instructors: TBD</h5>
+     <h3> </h3>
+    <table class="table table-striped">
+        <tr> <td>09:00 - 09:15 </td> <td> <a href="novice/DHTC/01-IntroGrid.html">Introduction to OSG </a> &nbsp;&nbsp; [<a href="https://docs.google.com/presentation/d/1JoFWLGp1ukW_quqPSPTTxCL6ZxC_nX2KD8Ut9GRwo1I/edit?usp=sharing">Slides</a>]</td> </tr>
+      <tr> <td>09:15 - 10:00 </td> <td><a href="novice/DHTC/04-HTCondor-Submitting.html">Job Scheduling with HTCondor</a></td> </tr>
+      <tr> <td>10:00 - 10:30 </td> <td><a href="novice/DHTC/04a-ScalingUp-python.html">Large scale Computation with HTCondor</a> </td> </tr>
+      <tr> <td>10:30 - 11:00</td> <td><em>Coffee break</em></td> </tr>
+      <tr> <td>11:00 - 11:45 </td> <td><a href="novice/DHTC/04-dagman.html">HTCondor DAGMan</a> </td></td></td></tr>
+      <!-- tr> <td>11:45 - 12:20 </td> <td><a href="novice/DHTC/08-condor_annex.html">Adding Resources from Amazon AWS</a> &nbsp;&nbsp; [<a href="https://docs.google.com/presentation/d/1uZw35Z6UwoEQ5vWEmMNmIoGzVCEblxBcNrHDUg7DIhw/edit?usp=sharing">Slides</a>]</td></td></td></tr -->
+      <tr> <td>12:20 - 12:30 </td> <td>Wrap up, <a href="https://goo.gl/forms/oQvGAE3eRfhQLUS52">feedback for the workshop</a> and <a href="http://osgconnect.net/signup">account signups</a></td></td></td></tr>
+    </table>
+  </div>
+<hr/>
+
+
+
+<!--
+    Edit this block to show what topics will be covered.
+-->
+
+<h2>Setup Instructions </h2>
+<p>
+  <a href="setup.html">Instructions to set up the required software on Linux, Windows and Mac laptops</a>
+</p>
+<hr/> 
+
+<!--
+<h2>Feedback</h2>
+<p>
+  <a href="https://docs.google.com/forms/d/1kJJ0QGsY_Aqpn1rdN5Ng8KuBoL5lpmjFXQcFS3SMKwo/edit">Feedback for the workshop</a>. 
+</p>
+<hr/>
+-->
+
+
+<!--
+    Edit the setup instructions in _includes/setup.html to reflect your bootcamp.
+    (In particular, most bootcamps teach either Python or R, not both.)
+-->
