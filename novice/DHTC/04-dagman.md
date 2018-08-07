@@ -111,9 +111,9 @@ We submit the DAGMan task using the command `condor_submit_dag`
     -----------------------------------------------------------------------
     
 
-Let's monitor the job status every two seconds. (Recall `connect watch` from a previous lesson.
+Let's monitor the job status every two seconds. 
 
-    $ connect watch 2
+    $ watch -n2 condor_q -nobatch
 
     -- Submitter: login01.osgconnect.net : <192.170.227.195:48781> : login01.osgconnect.net
     ID      OWNER            SUBMITTED     RUN_TIME ST PRI SIZE CMD               
@@ -312,11 +312,11 @@ One additional feature of DAGMan is that you are able to tune how many total job
 
 DAGMan can be configured to allow you operate within those limits. The simplest way is to pass a text file with your configuration parameters to `condor_submit_dag`: `condor_submit_dag -config dagman.config your_dag.dag`. The configuration file will look something like:
 
-    DAGMAN_MAX_JOBS_IDLE=30000
+    DAGMAN_MAX_JOBS_IDLE=1000
     DAGMAN_USER_LOG_SCAN_INTERVAL=1
     DAGMAN_MAX_SUBMITS_PER_INTERVAL=10
 
-`DAGMAN_MAX_JOBS_IDLE` tells your DAGMan job to limit the maximum number of jobs that are sitting in the queue to be 30000. `DAGMAN_USER_LOG_SCAN_INTERVAL` tells your DAGMan how often to look for a changed job state, i.e. that a job failed or completed. `DAGMAN_MAX_SUBMITS_PER_INTERVAL` is to tune how many jobs DAGMan submits every interval. The last two variables are for tuning how rapidly and how many jobs are submitted. For more configuration parameters and their documentation, go [here](http://research.cs.wisc.edu/htcondor/manual/v7.8/3_3Configuration.html#sec:DAGMan-Config-File-Entries)
+`DAGMAN_MAX_JOBS_IDLE` tells your DAGMan job to limit the maximum number of jobs that are sitting in the queue to be 1000. `DAGMAN_USER_LOG_SCAN_INTERVAL` tells your DAGMan how often to look for a changed job state, i.e. that a job failed or completed. `DAGMAN_MAX_SUBMITS_PER_INTERVAL` is to tune how many jobs DAGMan submits every interval. The last two variables are for tuning how rapidly and how many jobs are submitted. For more configuration parameters and their documentation, go [here](http://research.cs.wisc.edu/htcondor/manual/v8.6/3_5Configuration_Macros.html#sec:DAGMan-Config-File-Entries)
 
 <h3> Managing Job Interdependecy with DAGMan </h3>
 
