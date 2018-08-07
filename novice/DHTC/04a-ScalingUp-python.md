@@ -245,7 +245,7 @@ Apply your `condor_q` and `watch` knowledge to see this job progress. After all 
 
 ## Beyond the `queue` Keyword
 
-For larger workloads, with more than 100 jobs or job interdependencies, there are a couple tools (DAGMan and Pegasus) that we recommend using. They are beyond the scope of this tutorial. Please contact our support staff for more details. 
+For larger workloads, with more than 100 jobs or job interdependencies, there are a couple tools (DAGMan and Pegasus) that we recommend using.
 
 <!-- <div class="keypoints" markdown="1">
 #### Key Points
