@@ -1,52 +1,55 @@
 ---
 layout: lesson
 root: ../..
-title: Introduction to Open Science Grid 
+title: Introduction to the Open Science Grid 
 ---
 <!-- <div class="objectives" markdown="1">
 
 #### Objectives
-*   Get to know what is Open Science Grid
-*   What resources are open to academic researchers
-*   Computation that is a good match for OSG
-*   Computation that is NOT a good match for OSG
+*   Overview of the Open Science Grid consortium and available resources.
+*   Understand what computational is and isn't well-supported on the OSG.
+*   Begin working with OSG software modules and tutorials in preparation for remaining exercises.
 
 </div> -->
 
 ## The Open Science Grid
 
-The Open Science Grid (OSG) is a consortium of research communities that provides resources to use distributed [high throughput computing](http://en.wikipedia.org/wiki/High-throughput_computing) for scientific research. The OSG
+The [Open Science Grid (OSG)](http://opensciencegrid.org/) is a consortium of research communities that provides resources to use distributed [high throughput computing (HTC)](http://en.wikipedia.org/wiki/High-throughput_computing) for scientific research. The OSG:
 
-* Enables distributed computing on more than 120 institutions (for additional detail and geographic distribution of sites, check the [Introduction to OSG slides](https://docs.google.com/presentation/d/15__woXk4h-F2XThw4lGxBr8_VWtQKZIHYMS1q6qAi0Q/edit?usp=sharing)),
-* Supports efficient data processing, and 
-* Provides large scale scientific computing of 2 million core CPU hours per day.
-
-The OSG provides the unused compute resources at the various OSG contributors opportunistically in an shared pool to outside researchers. This means that resource availability may vary greatly with time. 
+* Enables distributed computing on backfill capacity at more than 120 institutions.
+* Delivers nearly 2 million core CPU hours per day, including ~500,000 'opportunistic' hours available to campuses and individual research groups (though this varies significantly from day-to-day, and there's even more un-tapped capacity available).
+* Allows campuses to join the consortium by (1) contributing their own backfill capacity (from just about any 'type' of Linux cluster), and/or (2) establishing a local submission point for local researchers to access OSG.
+* Provides the OSG Connect service for individual research groups who do not have a local OSG submission point.
+* Supports a variety of common research applications in a core OSG-maintained repository (called OASIS).
+* Supports several options for working with large, per-job input and output.
+* Leverages the HTC-optimized [HTCondor compute scheduling software](https://research.cs.wisc.edu/htcondor/) for job queueing and execution (on top of a layer of OSG-specific softwae and tools).
 
 ![fig 1](https://raw.githubusercontent.com/SWC-OSG-Workshop/OSG-UserTraining-RMACC17/gh-pages/novice/DHTC/Images/osg_job_flow.png)
 
-## Computation that is a good match for OSG 
+### Computation that is a good match for OSG 
 
-High throughput workflows with simple system and data dependencies are a good fit for OSG. Typically, these workflows can be broken down into multiple tasks that can be carried out independently. Ideally, these tasks will download input data, run a computation, and then return results (which may be used by future tasks).
+Computational workloads that are accelerated with an HTC execution approach are those that can parallelize naturally to numerous, completely independent 'jobs', and this turns out to be the case for VERY many research workloads, especially those typically defined as 'big data'. For example, parameter space optimizations, image processing, various forms of text processing (including much of computational genomics and bioinformatics), and sets of numerous, relatively-small simulations can all be executed as numerous, independent jobs whose results can be later combined or analyzed. Nearly every time a researcher has written their own code with an internal 'mapping' or 'loop' step that is the very time-intensive, they will see far greater throughput by using an HTC execution approach and be able to expand the 'space' of their computational work to tackle greater research challenges.
 
-Jobs submitted to the OSG will be executed at several remote clusters. These machines will differ in terms of computing environment from the submit node. Therefore it is important that the jobs are as self-contained as possible. The necessary binaries, scripts, and data should either carried with the job or staged on demand. 
+**The *best* HTC workloads for OSG** can be executed as many jobs that EACH complete on 1 CPU core in less than 12 hours, with less than 100 MB of input or output data. The HTCondor queueing system can transfer all executables, input data, and output data (up to a certain size) from the submit server to the job, as specified in job submit files created by the user. However, the technologies in OSG also support jobs needing multiple cores, GPUs, and larger per-job data. Generally, the 'less' each job needs, the more jobs a user will have running, and sooner. Jobs requesting 1 CPU core and less than 1 GB of memory will typically get hundreds or up to thousands of cores running their jobs in the OSG, and reach that maximum within several hours of initially submitting the jobs.
 
-Consider the following guidelines:
+Another component of 'fit' for jobs running on OSG pertains to the necessary software and computing environment. Jobs submitted to the OSG will be executed at several remote clusters (OSG is a *distributed* HTC, or 'dHTC' environment). The execute servers at each of these will differ a bit from the computing environment on the submit server, but all of OSG execute servers currently run RedHat-compatible Linux of major version 6 (decreasingly) or 7. This heterogeneity means that jobs will run most consistently if they bring along the major portions of the software environment they'll need (or leverage OSG-provided software for common applications). Jobs that leverage statically-compiled binaries (which includes many genomics applications, for example) are the most robust across the environment heterogeneity in OSG, but there are many users whose jobs bring along a pre-compiled version of Python or R, or leverage Matlab's runtime interpreter for compiled Matlab code, as just a few examples.
 
-* Software should preferably be single threaded, using less than 2 GB memory and each instance should run for 1-12 hours (optimally under 3 hours). There is support for jobs with longer run time, more memory or multi-threading support. Please contact the user support listed below for more information about these capabilities.
-* Only core utilities can be expected on the remote end. There is no standard version of software such as `gcc`, `python`, `BLAS`, or others. Consider using Software Modules, see below, to manage software dependencies, or look through our [High Throughput Computing Recipes](https://support.opensciencegrid.org/support/solutions/5000161171).
-* No shared file system. Jobs must transfer all executables, input data, and output data. Input and output data for each job should be < 10 GB to allow them to be transferred in by the jobs, processed and returned to the submit node. The scheduler, HTCondor, can transfer the files for you. Depending on the size of your input and output files, other transfer methods (`scp`, `rsync`, `GridFTP`) may be better suited. Please contact the user support listed below for more information
+**Consider the following dHTC guidelines:**
 
-## Computation that is NOT a good match for OSG 
+* Jobs should run single-threaded, individually using less than 2 GB memory and running for 1-12 hours. There is support for jobs with longer run time, more memory or multi-threading support (just fewer 'slots' regularly becoming available for them, and jobs can be evicted at any time).
+* Only core utilities can be expected on the remote end. There is no standard version of software even for `gcc`, `python`, `BLAS`, or others. Consider using OSG-supported Software Modules, see below, to manage software dependencies, look through our [High Throughput Computing Recipes](https://support.opensciencegrid.org/support/solutions/5000161171), or get in touch with the OSG Connect team to discuss the best approach for 'packing up' your software dependencies.
+* Input and output data for each job should be < 10 GB to allow them to be transferred in by the jobs, processed and returned to the submit node. The scheduler, HTCondor, can transfer input and output files up to 100 MB (~500 MB total per job), and other transfer methods (`scp`, `rsync`, `GridFTP`) are better suited for larger per-job data transfers. Please contact the user support listed below for more information
+
+### Computation that is NOT a good match for OSG 
 
 The following are examples of computations that are NOT good matches for 
 OSG:
 
-* Tightly coupled computations, for example using MPI-based communication across multiple compute nodes, due to the distributed nature of the infrastructure.
+* Tightly coupled computations, for example using MPI-based communication across multiple compute nodes (due to the distributed nature of the OSG infrastructure).
 * Computations requiring a shared file system, as there is no shared file system between the different clusters on the OSG.
-* Computations requiring complex software deployments or proprietary software are not a good fit. There is limited support for distributing software to the compute clusters, but for complex software, or licensed software, deployment can be a major task.
+* Computations requiring complex software deployments or proprietary software are not a good fit. There is limited support for distributing software to the compute clusters, and for complex software, or licensed software, deployment can be a nearly impossible task.
 
-## How to get help using OSG
+### How to get help using or joining OSG
 
 Please contact user support staff at [user-support@opensciencegrid.org](mailto:user-support@opensciencegrid.org).
 
@@ -59,7 +62,7 @@ We will also cover the usage of the built-in `tutorial` command. Using `tutorial
 
 ### Software Modules
 
-To take a look at the `module` command, log in to the submit host via SSH:
+To take a look at the `module` command, log in to the OSG Connect submit host via SSH:
 
     $ ssh username@training.osgconnect.net
 
@@ -110,21 +113,19 @@ If you want to unload a module, type
     $ module unload R 
 
 
-For a more complete list of all available modules please check the [support page](https://support.opensciencegrid.org/support/solutions/articles/5000634397-software-modules-catalog) or `module spider`. 
+For a more complete list of all available modules please check the [support page](https://support.opensciencegrid.org/support/solutions/articles/5000634397-software-modules-catalog) or `module spider`. Local submit nodes and OSG member institutions can also leverage the same set of OSG-supported software modules.
 
 ### Tutorial Command
 
-The built-in `tutorial` command assists a user in getting started on OSG.  To see the list of existing tutorials, type
+The built-in `tutorial` command assists a user in getting started on OSG Connect servers.  To see the list of existing tutorials, type
 
 
-    # will print a list tutorials
     $ tutorial 
 
 Say, for example, you are interested in learning how to run R scripts on OSG, the 
 `tutorial` command sets up the R tutorial for you. 
 
     $ tutorial R  
-    # prints the following message:
     Installing R (master)...
     Tutorial files installed in ./tutorial-R.
     Running setup in ./tutorial-R...
@@ -143,7 +144,7 @@ The `tutorial R` command creates a directory `tutorial-R` containing the necessa
 
 Let's focus on `mcpi.R` and the R wrapper scripts. The details of `R.submit` script will be discussed later when we learn about submitting jobs with HTCondor.  
 
-The file `mcpi.R` is a R script that calculates the value of *pi* using the Monte Carlo method. The `R-wrapper.sh` essentially loads the R module and runs the `mcpi.R`
+The file `mcpi.R` is an R script that calculates the value of *pi* using the Monte Carlo method. The `R-wrapper.sh` essentially loads the R module and runs the `mcpi.R`
 script. 
 
 
@@ -166,10 +167,11 @@ There are other tutorials available, which can serve as templates to develop you
 <!-- <div class="keypoints" markdown="1">
 
 #### Key Points
-*   OSG resources are distributed across 120 institutions and  supports scientific computing of 2 million core CPU hours per day.   
-*   Many scientific applications are installed on OSG and available for the users. 
-*   To use an existing application use the module load command. 
-*   The command - `tutorial` helps to access the existing tutorials.  
+*   OSG resources are distributed across 120 institutions and support scientific computing of 2 million core CPU hours per day.   
+*   Many research workloads are a good fit for HTC and dHTC. 
+*   A number of common applications are installed on OSG and available for the users via software modules. 
+*   The command `tutorial` includes numerous tutorials (with additional info in the [OSG Helpdesk](https://support.opensciencegrid.org/support/home).  
+
 </div> -->
 
 
