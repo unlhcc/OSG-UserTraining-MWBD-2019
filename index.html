@@ -55,12 +55,14 @@ Workloads; Managing data
 {% endif %}
 
 <!-- This block displays the helpers' names if they are available. -->
+<!--
 {% if page.helper %}
 <p>
   <strong>Helpers:</strong>
   {{page.helper | join: ', ' %}}
 </p>
 {% endif %}
+-->
 
 <!--
     Modify this block to reflect the target audience for your bootcamp.
@@ -105,30 +107,12 @@ Workloads; Managing data
   for more information.
 </p>
 
-<p>
-  <strong>Conference</strong>:
-  <a href="{{page.conference}}">{{page.conference}}</a>
-</p>
 
-
-<hr/>
-
-{% if page.registration %}
-<h2>Registration</h2>
-<p>
-Space is limited for the event. To register,  please <a href="{{page.registration}}"> visit the OSG-AHM registration page </a>.
-</p>
-{% endif %}
 <hr/>
 
 <h2>Schedule</h2>
 <h2> </h2>
 <div class="row-fluid">
-    <h4> High-Throughput Computation on the Open Science Grid </h4>
-    <h4> Aug 9, 2018, 1:00 AM - 4:30 AM </h4>
-    <h5>Location: Officers Club, University of Utah, Salt Lake City. </h5>
-    <h5>Instructors: TBD</h5>
-     <h3> </h3>
     <table class="table table-striped">
         <tr> <td>1:00 - 1:15 </td> <td> <a href="novice/DHTC/01-IntroGrid.html">Introduction to the Open Science Grid </a> &nbsp;&nbsp; [Slides]</td> </tr>
       <tr> <td>1:15 - 2:00 </td> <td><a href="novice/DHTC/04-HTCondor-Submitting.html">Job Scheduling with HTCondor</a></td> </tr>

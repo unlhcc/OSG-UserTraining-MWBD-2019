@@ -264,21 +264,56 @@ In addition to these files, the following input files are needed for the jobs:
 * database file: **nt.fa**
 * database index files: **nt.fa.nhr  nt.fa.nin  nt.fa.nsq**
 
-These files are currently being stored in `/cvmfs/stash.osgstorage.org/user/eharstad/public/blast_database/`.
+These files are currently being stored in `/cvmfs/stash.osgstorage.org/user/eharstad/public/blast_database_old/`.
+
 
 ***
-First, let's take a look at the HTCondor job submission script:
+
+The first example we will explore will be using the `stashcp` command to fetch the Blast databases. Change
+directory into the *stashcp* sub-directory:
+
+    $ cd stashcp
+
+In there you will find the query files, the wrapper and submit script. The wrapper is the most interesting part:
+
+    $ cat blast_wrapper.sh 
+    #!/bin/bash
+    
+    module load stashcp
+    module load blast
+    
+    set -e
+    
+    stashcp /user/eharstad/public/blast_database_old/nt.fa .
+    stashcp /user/eharstad/public/blast_database_old/nt.fa.nhr .
+    stashcp /user/eharstad/public/blast_database_old/nt.fa.nin .
+    stashcp /user/eharstad/public/blast_database_old/nt.fa.nsq .
+    
+    "$@"
+
+Note how we `module load stashcp` and then use the `stashcp` command to download the database. The downloads
+are being cached at different levels in the infrastructure and is a very efficient way of accessing data
+repeatedly.
+
+You may submit the workload and examine the output files when the jobs are done.
+
+***
+
+An alternative way of accessing public stash data is using `/cvmfs/stash.osgstorage.org`. Data is picked up from your public directory
+and made available on CVMFS automatically, but it might take a little bit time for the data to appear. This is a good solution
+for static data, and POSIX-like reads (including partial reads).
+
+Let's take a look at the HTCondor job submission script:
 
     $ cat blast.submit
     universe = vanilla
 
     executable = blast_wrapper.sh
-    arguments  = blastn -db /cvmfs/stash.osgstorage.org/user/eharstad/public/blast_database/nt.fa -query $(queryfile)
+    arguments  = blastn -db /cvmfs/stash.osgstorage.org/user/eharstad/public/blast_database_old/nt.fa -query $(queryfile)
     should_transfer_files = YES
     when_to_transfer_output = ON_EXIT
     transfer_input_files = $(queryfile)
 
-    +WantsCvmfsStash = true
     requirements = OSGVO_OS_STRING == "RHEL 6" && Arch == "X86_64" && HAS_MODULES == True && HAS_CVMFS_stash_osgstorage_org == True
 
     output = job.out.$(Cluster).$(Process)
@@ -290,10 +325,6 @@ First, let's take a look at the HTCondor job submission script:
 
 The executable for this job is a wrapper script, `blast_wrapper.sh`, that takes as arguments the blast command that we want to run on the compute host.  We specify which query file we want transferred (using HTCondor) to each job site with the *transfer_input_files* command.
 
-Note the one additional line that is required in the submit script of any job that uses StashCache:
-
-    +WantsCvmfsStash = true
-
 Finally, since there are multiple query files, we submit them with the command `queue queryfile matching query*.fa` command.  Because we have used the $(queryfile) macro in the name of the query input files, only one query file will be transferred to each job.
 
 ***
@@ -301,7 +332,7 @@ Now, let's take a look at the job wrapper script which is the job's executable:
 
     $ cat blast_wrapper.sh
     #!/bin/bash
-    # Load the blast module
+
     module load blast
 
     set -e
@@ -321,7 +352,15 @@ You are now ready to submit the jobs:
 
 <div class="keypoints" markdown="1">
 
+## Challenges
+
+* Why is `transfer_output_files = ""` important in the stashcp example submit file? What happens if you leave it out? (Hint: `ls` in the submit directory after the jobs are done)
+
 #### Key Points
-* Data can be transferred in and out of Stash using scp and Globus
+
+* Data can be transferred in and out of Stash using scp and Globus Online
+
+* stashcache (stashcp and /cvmfs) provides efficient access to input data during job execution
+
 </div>
 
