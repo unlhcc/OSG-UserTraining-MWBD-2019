@@ -1,15 +1,14 @@
 ---
 layout: lesson
 root: ../..
-title: Introduction to Open Science Grid 
+title: Introduction to the Open Science Grid 
 ---
 <!-- <div class="objectives" markdown="1">
 
 #### Objectives
-*   Get to know what is Open Science Grid
-*   What resources are open to academic researchers
-*   Computation that is a good match for OSG
-*   Computation that is NOT a good match for OSG
+*   Overview of the Open Science Grid consortium and available resources.
+*   Understand what computational is and isn't well-supported on the OSG.
+*   Begin working with OSG software modules and tutorials in preparation for remaining exercises.
 
 </div> -->
 
