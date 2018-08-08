@@ -12,26 +12,27 @@ title: Job Scheduling with HTCondor
 
 ## Overview
 
-In this section, we will learn the basics of HTCondor in submitting and monitoring workloads, or "jobs". The typical cycle for a job is:
+In this section, we will learn the basics of HTCondor in submitting and monitoring workloads, or "jobs", which is extremely similar to job submission using other queueing systems, but differs in some ways that make HTC a lot easier. The typical cycle for a set of HTC jobs is:
 
-1. Job is submitted through the submit host
-2. Job is executed on the remote worker node.
-3. Job executes or fails and the logs and, if configured, outputs are transfered back to the login node. 
+1. Job(s) submitted to the queue on the submit server.
+2. Job is matched to an execute server and user-indicated files transfered to a temporary job working directory.
+3. Job executable is executed in the job working directory on the execute server (executable needs to create output files in the 'current' or 'present' directory).
+4. HTCondor captures any executable errors and terminal output/error information, and transfers all newly-created files back to the submission directory on the submit server.
 
-In HTCondor we use a job submit file to describe how to execute the program, transfer data, and what the system requirements of a job are.
+In HTCondor the job submit file (separate from the job executable) communicates how many jobs to submit, what data to transfer to the job, and the resource requirements of the job(s).
 
 <!-- ![fig 1](https://raw.githubusercontent.com/OSGConnect/tutorial-quickstart/master/Images/jobSubmit.png) -->
 
+## Submit a 'Dummy' Job to learn HTCondor Submission
 
-## Job Execution Script
+### Job Execution Script
 
-We will get our examples using the `tutorial` command.
+We will retrieve data for some examples from the `tutorial` options on the OSG Connect Server. Let's get started with the `quickstart` tutorial, which will download a directory of job setup files named `tutorial-quickstart`:
 
-Let's get started with the `quickstart` tutorial:
-
-    # creates a directory "tutorial-quickstart"
     $ tutorial quickstart
-    # script and input files are inside this directory  
+    Installing quickstart (master)...
+    Tutorial files installed in ./tutorial-quickstart.
+    Running setup in ./tutorial-quickstart...
     $ cd tutorial-quickstart
 
 We will look at two files in detail: `short.sh` and `tutorial01.submit`
@@ -40,7 +41,7 @@ Inside the tutorial directory, look at `short.sh` using
 
     $ cat short.sh
 
-This is an ordinary shell script.
+This is an ordinary shell script that will print various information about the server it runs on, but isn't really going to do any science or produce any specific output files:
 
     #!/bin/bash
     # short.sh: a short discovery job
@@ -53,61 +54,62 @@ This is an ordinary shell script.
     sleep 20
     echo "Science complete!"
 
-Now, make the script executable.
+Now, add executable (x) permissions to this script, so that it can be run as an executable on Linux computers:
 
     $ chmod +x short.sh
 
-Making the script executable and the "shebang" line (`#!/bin/bash`) line at the top of the script are not necessary for programs that are only run locally. However, _it is extremely important for jobs running on the grid_.
+Making the script executable and the "shebang" line (`#!/bin/bash`) line at the top of the script are not necessary for programs that are only run locally. However, _it is extremely important for jobs running on the various servers across the OSG_.
 
-Since we used the `tutorial` command, all files are already in your workspace. Test jobs on the submit host first b locally when setting up a new job type -- it is good to test your job outside of HTCondor before submitting into the Open Science Grid.
+Since this is a simple script, we can test it on the submit server. (It's important to test 'real' job executables with one or a few submitted jobs, perhaps using an interactive job submission or on another Linux server; many real programs can overuse the resources on the submit server if tested there.)
 
     $ ./short.sh
-    Start time: Mon Mar  6 00:08:06 CST 2017
+    Start time: Mon Aug  6 00:08:06 CST 2018
     Job is running on node: training.osgconnect.net
     Job running as user: uid=46628(username) gid=46628(username) groups=46628(username),400(condor),401(ciconnect-staff),1000(users)
     Job is running in directory: /tmp/Test/tutorial-quickstart
     Working hard...
     Science complete!
 
-## Job Description File
+### Job Description File
 
-Next we will create a simple (if verbose) HTCondor submit file.  A submit file tells the HTCondor _how_ to run your workload, with what properties and arguments, and, optionally, how to return output to the submit host.
+Next we will create a simple (though verbose with comments) HTCondor submit file.  A submit file tells the HTCondor _how_ to run your workload, with what properties and arguments, and, optionally, how to return output to the submit host.
 
     $ cat tutorial01.submit
-
+    
     # The UNIVERSE defines an execution environment. You will almost always use VANILLA.
     Universe = vanilla
-
+    
     # EXECUTABLE is the program your job will run It's often useful
     # to create a shell script to "wrap" your actual work.
     Executable = short.sh
-
+    
     # ERROR and OUTPUT are the error and output channels from your job
     # that HTCondor returns from the remote host.
     Error = job.error
     Output = job.output
-
+    
     # The LOG file is where HTCondor places information about your
     # job's status, success, and resource consumption.
     Log = job.log
-
+    
     # QUEUE is the "start button" - it launches any jobs that have been
     # specified thus far.
     queue 1
 
-## Job Submission
+### Job Submission
 
 Submit the job using `condor_submit`.
-
 
     $ condor_submit tutorial01.submit
     Submitting job(s).
     1 job(s) submitted to cluster 1144.
+    
+The 'cluster' number is how HTCondor (and you) will identify this set of submitted jobs (one job for this first example).
 
 
-## Job Status
+### Job Status
 
-The `condor_q` command tells the status of currently running jobs. Please note that the `condor_q` command line interface has changed in recent HTCondor versions, and in this tutorial we are using the new version.
+The `condor_q` command tells the status of not-yet-completed jobs. We have submitted one job to the queue:
 
     $ condor_q
 
@@ -115,11 +117,9 @@ The `condor_q` command tells the status of currently running jobs. Please note t
     OWNER    BATCH_NAME       SUBMITTED   DONE   RUN    IDLE  TOTAL JOB_IDS
     username CMD: short.sh   6/30 15:17      _      _      1      1 1872.0
 
-    Total for query: 1 jobs; 0 completed, 0 removed, 1 idle, 0 running, 0 held, 0 suspended 
-    Total for username: 1 jobs; 0 completed, 0 removed, 1 idle, 0 running, 0 held, 0 suspended 
-    Total for all users: 1 jobs; 0 completed, 0 removed, 1 idle, 0 running, 0 held, 0 suspended
+    1 jobs; 0 completed, 0 removed, 1 idle, 0 running, 0 held, 0 suspended 
 
-This new output format "batches" similar jobs together. If you want to see each individual job, use the `-nobatch` option:
+The default `condor_q` output format "batches" similar jobs together, which will make it easier to manage multiple batches of *MANY* HTC jobs. If you want to see more details about each individual job, use the `-nobatch` option:
 
     $ condor_q -nobatch
 
@@ -127,15 +127,13 @@ This new output format "batches" similar jobs together. If you want to see each 
      ID      OWNER            SUBMITTED     RUN_TIME ST PRI SIZE CMD
     1873.0   rynge           6/30 15:19   0+00:00:00 I  0    0.0 short.sh
 
-    Total for query: 1 jobs; 0 completed, 0 removed, 1 idle, 0 running, 0 held, 0 suspended 
-    Total for rynge: 1 jobs; 0 completed, 0 removed, 1 idle, 0 running, 0 held, 0 suspended 
-    Total for all users: 1 jobs; 0 completed, 0 removed, 1 idle, 0 running, 0 held, 0 suspended
+    1 jobs; 0 completed, 0 removed, 1 idle, 0 running, 0 held, 0 suspended 
 
-If you want to see all jobs running on the system, use `condor_q -allusers`.
+If you want to see jobs submitted by all users on the submit server, use `condor_q -all`. (There are a number of other options to condor_q, only some of which we'll cover.)
 
-You can also get status on a specific job cluster:
+You can also get status on a specific job `cluster`(which includes all jobs from the submission of a single submit file), even for a different user:
 
-    $ condor_q -nobatch 1144.0 
+    $ condor_q -nobatch 1082 
 
     -- Schedd: training.osgconnect.net : <192.170.227.119:9419?...
      ID      OWNER            SUBMITTED     RUN_TIME ST PRI SIZE CMD               
@@ -145,7 +143,7 @@ You can also get status on a specific job cluster:
 
 Note the ST (state) column. Your job will be in the `I` state (idle) if it hasn't started yet. If it's running, it will have state `R` (running). If it has completed already, it will not appear in `condor_q`.
 
-Let's wait for your job to finish – that is, for `condor_q` not to show the job in its output. A useful tool for this is `watch`. It runs a program repeatedly, letting you see how the output changes at fixed time intervals. Let's submit the job again, and watch condor_q output at two-second intervals:
+Let's wait for your job to finish – that is, for `condor_q` not to show the job in its output. A useful tool for this is `watch`. It runs a program repeatedly, letting you see how the output changes. Let's submit the job again, and `watch` the condor_q output at two-second intervals:
 
     $ condor_submit tutorial01.submit
     Submitting job(s). 
@@ -153,9 +151,9 @@ Let's wait for your job to finish – that is, for `condor_q` not to show the jo
     $ watch -n2 condor_q $USER 
 
 
-When your job has completed, it will disappear from the list.  To close watch, hold down Ctrl and press C.
+When your job has completed, it will disappear from the list.  To close `watch`, hold down Ctrl and press C.
 
-## Job History
+### Job History
 
 Once your job has finished, you can get information about its execution
 from the `condor_history` command:
@@ -164,18 +162,17 @@ from the `condor_history` command:
     ID     OWNER          SUBMITTED   RUN_TIME     ST COMPLETED   CMD            
     1144.0   osguser50       3/6  00:17   0+00:00:27 C   3/6  00:28 /share/training/..
 
-You can see much more information about your job's final status using the `-long` option.
+You can see much more information about your job's final status using the `-long` option. To close the work of `condor_history` (as it may keep traversing the very long history of jobs on this submit server), use Ctrl-C, as you did for the `watch` command.
 
-## Job Output
+### Job Output
 
 Once your job has finished, you can look at the files that HTCondor has returned to the working directory. If everything was successful, it should have returned:
 
-* `job.output`: An output file for each job's output
-* `job.error`: An error file for each job's errors
-* `job.log`: A log  file for each job's log
+* `job.output`: An output file for each job's terminal-printed output ("standard output")
+* `job.error`: An error file for any error messages ("standard error")
+* `job.log`: A log file for each job's HTCondor logging information
 
-Read the output file. It should be something like this:
-
+Read the output file, which should show something like the below:
 
     $ cat job.output
     Start time: Wed Mar  8 18:16:04 CST 2017
@@ -186,9 +183,9 @@ Read the output file. It should be something like this:
     Science complete!
 
 
-## Removing Jobs
+### Removing Jobs
 
-You may want to remove individual or all your workloads from the queue. The command to remove jobs from the queue is `condor_rm`. It takes one argument, either the job ID or your username. Providing the job ID will remove only that job:
+You may want to remove individual or all your workloads from the queue. The command to remove jobs from the queue is `condor_rm`. It takes one or more arguments corresponding to job cluster numbers, job ID numbers, or your username (to remove ALL of *your* jobs). Providing the job ID will remove only that job:
 
     $ condor_submit tutorial01.submit
     Submitting job(s).
@@ -203,29 +200,32 @@ while providing your username will remove all jobs associated with your username
 
 ## Basics of HTCondor Matchmaking
 
-As you have seen in the previous lesson, HTCondor is a batch management system that handles running jobs on a cluster. Like other full-featured batch systems, HTCondor provides a job queuing mechanism, scheduling policy, priority scheme, resource monitoring, and resource management. Users submit their jobs to a HTCondor scheduler. HTCondor places the jobs into a queue, chooses when and where to run the jobs based upon a policy, carefully monitors the their progress, and ultimately informs the user upon completion or failure. This lesson will go over some of the specifics of how HTCondor selects where to run a particular job.  
+As you have seen in the previous example, HTCondor is a batch management system that handles running jobs on a cluster. Like other full-featured batch systems, HTCondor provides a job queuing mechanism, scheduling policy, priority scheme, resource monitoring, and resource management. HTCondor places submitted jobs into a queue, chooses when and where to run the jobs based upon a policy, carefully monitors the their progress, and ultimately informs the user upon completion or failure. This lesson will go over some of the specifics of how HTCondor selects where to run a particular job.  
 
-HTCondor selects nodes on which to run particular jobs using a matchmaking process.  When a job is submitted to HTCondor, HTCondor generates a set of attributes that the job needs in order to run. These attributes function like classified ads in the newspaper and are called "classad"s. The classads for a job indicate what it is looking for, just like a help wanted ad. For example:
+HTCondor selects nodes on which to run particular jobs using a matchmaking process.  When a job is submitted to HTCondor, HTCondor generates a set of attributes that the job needs in order to run. These attributes function like classified ads in the newspaper and are called "classads", indicating aspects of the job, including what it `wants`.  For example, we could ask `condor_q` for the full classad of a single job with the `-l` option (for the *long* list job attributes):
 
-    Requirements = OSGVO_OS_STRING == "RHEL 6" && Arch == "X86_64" && HAS_MODULES == True
+    $ condor_q -l 1082.0
 
-Let's examine what a machine classad looks like. This is a two step process, first we get a name for one of the machines, and then we ask `condor_status` to give us the details for that machine (`-long`).
+It's a long list, but there are a number of useful lines you can find there. For example, look for lines beginning with "Req".
 
-    $ condor_status -pool osg-flock.grid.iu.edu -af Name | head -n 1
-    [resource name]
-    $ condor_status -long -pool osg-flock.grid.iu.edu [resource name] | sort
+Similarly, HTCondor expresses aspects of matchable machine 'slots' and their requirements in the *machine* classads. Let's examine what a slot classad looks like. First we get a name for one of the slots with `condor_status` (like `condor_q` but for listing available machines), and then we ask `condor_status` to give us the details for that machine (with `-l`).
+
+    $ condor_status 
+    
+Then select a slot name from the left column, and examine the `condor_status -l` output:
+    
+    $ condor_status -l slot1@scott.grid.uchicago.edu
     [...]
     HAS_FILE_usr_lib64_libgfortran_so_3 = true
-    HAS_MODULES = false
-    OSGVO_OS_STRING = "RHEL 6"
+    OSGVO_OS_STRING = "RHEL 7"
     [...]
 
 
 HTCondor takes a list of classads from jobs and from compute nodes and then tries to make the classads with job requirements with the classads with compute node capabilities. When the two match, HTCondor will run the job on the compute node.
 
-## A Basic OSG Job
+## A Standard OSG Submit File
 
-You can make use any of these attributes to limit where your jobs go. The `osg-template-job.submit` file is an example of a fairly complete OSG job which you can use as a template submit script when getting started on OSG. Note the `Requirements` and `requests_*` lines.
+You can make use any of these attributes in your submit file "Requirements" line to limit where your jobs go, but know that doing so will mean that your jobs match to fewer 'slots', so you'll have less throughput across a batch of many jobs. The `osg-template-job.submit` file is an example of a fairly complete OSG job which you can use as a template submit script when getting started on OSG. Note the `Requirements` and `requests_*` lines.
 
 
     # The UNIVERSE defines an execution environment. You will almost always use VANILLA.
@@ -236,10 +236,12 @@ You can make use any of these attributes to limit where your jobs go. The `osg-t
     Requirements = OSGVO_OS_STRING == "RHEL 6" && Arch == "X86_64" && HAS_MODULES == True
     request_cpus = 1
     request_memory = 1 GB
+    request_disk = 10 GB
 
     # EXECUTABLE is the program your job will run It's often useful
     # to create a shell script to "wrap" your actual work.
     Executable = short.sh
+    Arguments = 
 
     # ERROR and OUTPUT are the error and output channels from your job
     # that HTCondor returns from the remote host. $(Cluster) is the 
@@ -256,7 +258,7 @@ You can make use any of these attributes to limit where your jobs go. The `osg-t
     on_exit_hold = (ExitBySignal == True) || (ExitCode != 0)  
 
     # Periodically retry the jobs every 60 seconds, up to a maximum of 5 retries.
-    periodic_release =  (NumJobStarts < 5) && ((CurrentTime - EnteredCurrentStatus) > 60)
+    periodic_release = (NumJobStarts < 5) && ((CurrentTime - EnteredCurrentStatus) > 60)
 
     # QUEUE is the "start button" - it launches any jobs that have been
     # specified thus far.
@@ -270,8 +272,8 @@ You can test this job by submitting and monitoring it as we have just covered:
     1 job(s) submitted to cluster 1151
 
 
-The filenames for this job includes a job id, which means that if you submit more
-than one job, they will all have unique outputs.
+The filenames for this job include the 'cluster' and 'process' values of the job ID, which means that if you submit more
+than one job, they will all have unique output and error files. (This is just one way to distinguish job's by their filenames or other 'ingredients'. We'll see more examples later.)
 
     $ ls *.output
     job.output
