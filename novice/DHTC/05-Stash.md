@@ -264,7 +264,7 @@ In addition to these files, the following input files are needed for the jobs:
 * database file: **nt.fa**
 * database index files: **nt.fa.nhr  nt.fa.nin  nt.fa.nsq**
 
-These files are currently being stored in `/cvmfs/stash.osgstorage.org/user/eharstad/public/blast_database_old/`.
+These files are currently being stored in `/stash/user/eharstad/public/blast_database_old/`.
 
 
 ***
