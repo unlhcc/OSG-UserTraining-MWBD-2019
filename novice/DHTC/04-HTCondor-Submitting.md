@@ -12,7 +12,15 @@ title: Job Scheduling with HTCondor
 
 ## Overview
 
-In this section, we will learn the basics of submitting and monitoring computing "jobs" with HTCondor, which is extremely similar to job submission using other queueing systems, but differs in some ways that make HTC a lot easier. The typical cycle for a set of HTC jobs is:
+In this section, we will learn the basics of submitting and monitoring 
+computing "jobs" with HTCondor, which is extremely similar to job 
+submission using other queueing systems, but differs in some ways that 
+make HTC a lot easier. For a great introduction to HTCondor's features
+for users, see the (HTCondor Week User Tutorial)[https://agenda.hep.wisc.edu/event/1201/session/4/contribution/5/material/slides/1.pdf] 
+(full documentation is available in the (HTCondor Manual)[http://research.cs.wisc.edu/htcondor/manual/current/2_Users_Manual.html]).
+
+
+The typical cycle for a set of HTC jobs is:
 
 1. Job(s) are submitted to the queue on the submit server.
 2. A job is matched to an execute server and user-indicated files transfered to a temporary job working directory.
