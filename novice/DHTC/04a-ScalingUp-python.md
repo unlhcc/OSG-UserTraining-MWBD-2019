@@ -7,50 +7,65 @@ title: Large Scale Computation with HTCondor
 <!-- <div class="objectives" markdown="1">
 
 #### Objectives
-*   Learn how to submit multiple jobs with a single job description file 
-*   Learn to efficiently use the Queue command 
+*   Learn how to submit multiple jobs with a single submit file.
+*   Experience the setup for Python jobs.
+*   Indicate (in the submit file) job file locations outside of the submission directory.
 </div> -->
 
 ## Overview
 
-To harness to full abilities of distributed high throughput computing on the OSG, it is necessary to learn how to scale up and control large numbers of jobs. This requires the ability to submit and process multiple jobs in parallel. Examples of workloads that require these considerations include multi-dimensional Monte Carlo integration using sampling, parameter sweep(s) for a given model, and molecular dynamics simulation with several initial conditions. All of these workloads require submitting more than a handful of jobs. 
+To harness to full abilities of distributed high throughput computing on the OSG, 
+HTCondor allows the user to easily submit and manage large numbers of jobs. While 
+serial computing executes one task at a time (on one or even few CPUs) and HPC 
+execution modes rely on specialized software to coordinate multiple CPU cores (typically 
+accompanied by queue waiting times to achieve the total number of requisit cores), 
+an HTC approach requires the execution of many independent jobs, each on one core 
+(or few cores), but without the need for synchronization.
 
 ![fig 1](https://raw.githubusercontent.com/SWC-OSG-Workshop/OSG-UserTraining-RMACC17/gh-pages/novice/DHTC/Images/htc_vs_hpc_serial.png)
 
-The HTCondor submit file keyword `queue` can run multiple jobs from a single job description file. In this tutorial, we will see how to scale up the calculations for a simple Python example using the `queue` keyword.
+Though the previous exercises used `queue 1` to submit a single job with each submit file, 
+the `queue` line of an HTCondor submit file can be used in various ways to indicate 
+that multiple jobs should be submitted according to the submit file contents, and can be 
+used in combination with other submit file contents to indicate what's different about 
+eah job. (This is one of the most iimportant reasons for having separate submit and executable 
+files.)
 
 Once we understand the basic HTCondor script to run a single job, it is easy to scale up.
 
-You can get the example files via the `tutorial` command,
+Move out of the `tutorial-quickstart` directory (back to your home directory) and grab a 
+new tutorial that will demonstrate examples for submitting multiple jobs at once:
 
+    $ cd
     $ tutorial ScalingUp-Python
     $ cd tutorial-ScalingUp-Python
 
-The `tutorial-ScalingUp-Python` directory contains all the required files. This includes the sample Python program, job description file, and executable files. 
+The `tutorial-ScalingUpdd-Python` directory contains sets of files for the below examples, 
+including a sample Python program, job description files, and executable files. 
 
-## Python Script
+## A Job with a Python Script
 
 Here, we are going to use a brute force approach to finding the minimum/maximum (also known as "optimiziation") of a two dimensional function on a grid of points. Let us take a look at the function (also known as the objective function) that we are trying to optimize:
 
     f = (1 - x)**2 + (y - x**2)**2
 
-This is the two dimensional Rosenbrock function, which is used to test the robustness of an optimization method. 
+This is the two dimensional Rosenbrock function, which is used to test the robustness of an optimization method. **It's not especially important that you understand the optimization component, in case you're curious, but it will be important to know that the script can work with or without arguments, as described below.**
 
-By default, Python script will randomly select the boundary values of the grid that the optimization procedure will scan over. These values can be overridden by user supplied values.
+By default, our Python script will randomly select the boundary values of the grid that the optimization procedure will scan over. These values can be overridden by user supplied values.
 
 ![fig 2](https://raw.githubusercontent.com/OSGConnect/tutorial-ScalingUp-Python/master/Images/RosenBrockFunction.png)
 
-To run the calculation with random boundary values, the script is executed without any argument
+To run the calculation with random boundary values, the script is executed without any arguments:
     
     $ module load python/3.4
     $ module load all-pkgs
     $ python rosen_brock_brute_opt.py
     
-To run the calculation with the user-supplied boundary values, the script is executed with input arguments
+To run the calculation with the user-supplied boundary values, the script is executed with four input arguments
 
     python rosen_brock_brute_opt.py x_low x_high y_low y_high
 
-where `x_low` and `x_high` are low and high values along x-direction, and `y_low` and `y_high` are the low and high values along the y-direction.
+where `x_low` and `x_high` are low and high values along the x-direction, and `y_low` and `y_high` are the low and high values along the y-direction.
 
 For example, to set the boundary in the x-direction as (-3, 3) and the boundary in the y-direction as (-2, 2), run
 
@@ -70,7 +85,7 @@ Let us take a look at the execution script, `cat scalingup-python-wrapper.sh`
 
     python ./rosen_brock_brute_opt.py  $1 $2 $3 $4
 
-The wrapper loads the the relevant modules and then executes the python script `rosen_brock_brute_opt.py`. The python script takes four optional arguments.
+The wrapper loads the the relevant modules (so our job will need to require servers in OSG that support OSG software modules) and then executes the python script `rosen_brock_brute_opt.py` with the four optional arguments.
 
 ## Submitting Set of Jobs with Single Submit File
 
@@ -83,143 +98,123 @@ Now let us take a look at job description file
 
 If we want to submit several jobs, we need to track log, out and error files for each job. An easy way to do this is to add the `$(Cluster)` and `$(Process)` variables to the file names. 
 
-    # The UNIVERSE defines an execution environment. You will almost always use VANILLA.
-    Universe = vanilla
-
-    # These are good base requirements for your jobs on the OSG. It is specific on OS and
-    # OS version, core, and memory, and wants to use the software modules. 
-    Requirements = OSGVO_OS_STRING == "RHEL 6" && TARGET.Arch == "X86_64" && HAS_MODULES == True 
-    request_cpus = 1
-    request_memory = 1 GB
-
-    # executable is the program your job will run 
-    # It's often useful to create a shell script to "wrap" your actual work.
-    executable = ../scalingup-python-wrapper.sh 
-
-    # files transferred into the job sandbox
+    # We can indicate the location of our executable, since it
+    #  exists one directory level up. We'll let these first tests 
+    #  run our python script without giving it any arguments.
+    executable = ../scalingup-python-wrapper.sh
+    
+    # Similarly, we can indicate the location of any other files 
+    #  that will need to be transfered into the job working directory.
+    #  If we don't specify which output files to transfer back,
+    #  HTCondor will just transfer back any new *files* from the job's
+    #  working directory:
     transfer_input_files = ../rosen_brock_brute_opt.py
-
-    # error and output are the error and output channels from your job
-    # that HTCondor returns from the remote host.
+    
+    # Additionally, we can indicate that our out/err/log files should 
+    #  be created by HTCondor within a subdirectory (or other location)
+    #  so that they don't clog up our submission directory:
     output = Log/job.out.$(Cluster).$(Process)
     error = Log/job.error.$(Cluster).$(Process)
-
-
-    # The log file is where HTCondor places information about your
-    # job's status, success, and resource consumption.
     log = Log/job.log.$(Cluster).$(Process)
-
-    # Send the job to Held state on failure. 
-    on_exit_hold = (ExitBySignal == True) || (ExitCode != 0)  
-
-    # Periodically retry the jobs every 60 seconds, up to a maximum of 5 retries. 
-    # The RANDOM_INTEGER(60, 600, 120) means random integers are generated between 
-    # 60 and 600 seconds with a step size of 120 seconds. The failed jobs are 
-    # randomly released with a spread of 1-10 minutes.  Releasing multiple jobs at 
-    # the same time causes stress for the login node, so the random spread is a 
-    # good approach to periodically release the failed jobs. 
-
-    PeriodicRelease = ( (CurrentTime - EnteredCurrentStatus) > $RANDOM_INTEGER(60, 600, 120) ) && ((NumJobStarts < 5))
-
-    # Queue is the "start button" - it launches any jobs that have been
-    # specified thus far.
+    
+    # We'll use that trick to hold and release (to re-run) any jobs that
+    #  happen to fail, in case their execute server was just missing some 
+    #  dependencies of our python program: 
+    on_exit_hold = (ExitBySignal == True) || (ExitCode != 0)
+    PeriodicRelease = ( (CurrentTime - EnteredCurrentStatus) > 600) ) && (NumJobStarts < 5)
+    
+    # Since we don't know the resource needs of our jobs, yet, we'll start with the below:
+    # Requirements = OSGVO_OS_STRING == "RHEL 6" && HAS_MODULES == True                           
+    request_cpus = 1
+    request_memory = 1 GB
+    request_disk = 1 GB
+    
+    # We'll queue 10 test jobs, to start, each of which should hae different
+    #  randomly generated bounds on the optimization parameter space.
     queue 10
 
-Note the `queue 10`. This tells HTCondor to queue 10 copies of this job under one cluster id.  
+Note the `queue 10`. This tells HTCondor to queue 10 jobs (with unique process values) under one cluster number.  
 
 Let us submit the above job
 
     $ condor_submit ScalingUp-PythonCals.submit
-    Submitting job(s)..........
-    10 job(s) submitted to cluster 329837.
 
-Apply your `condor_q` and `watch` (`watch -n2 condor_q $USER`) knowledge to see this job progress . After all jobs finished, execute the `post_process.sh` script to sort the results. 
+Apply your `condor_q` and `watch` (`watch -n2 condor_q $USER`) knowledge to see this job progress. After all jobs finished, execute the `post_process.sh` script to sort the results. 
 
     ./post_process.sh
 
-<!-- ## Other ways to use `queue` command
+## Other ways to use the `queue` command
 
-Now we will explore other ways to use `queue` command. In the previous example, we did not pass any argument to the program and it used randomly-generated boundary conditions. If we have some idea about where the minimum/maximum is, we can supply boundary conditions to the calculation through arguments. In our example, the minimum  of the Rosenbrock function is located at (1,1).
+Now we will explore another way to use `queue` command, which is just one of several  
+described well in the (HTCondor Week User Tutorial)[https://agenda.hep.wisc.edu/event/1201/session/4/contribution/5/material/slides/1.pdf] (and in the HTCondor Manual)[http://research.cs.wisc.edu/htcondor/manual/current/2_5Submitting_Job.html#SECTION00352000000000000000].
 
-### Supply multiple arguments via queue command
+In the previous example, 
+we did not pass any argument to the program and it used randomly-generated 
+boundary conditions. With the `queue N` approach, we could have passed the 
+`$(Process)` value as an argument, if 0-start integers made sense for our jobs or 
+if we were to have our program read the boundary values from different, numbered 
+input files for each job, but HTCondor give us a bit more flexibility. If we have some idea about where the minimum/maximum is, we can supply boundary conditions to the calculation through arguments. In our example, the minimum  of the Rosenbrock function is located at (1,1).
 
-![fig 4](https://raw.githubusercontent.com/OSGConnect/tutorial-ScalingUp-Python/master/Images/Slide3.png)
+### Variable Creation with the `queue` command
 
-We can still use a slightly modified version of job description file from the previous example to supply multiple arguments. The modified job description file is available in the `Example2` directory.  Move into that directory and take look at the end of job description file `ScalingUp-PythonCals.submit`:  
+<!-- 
+![fig 5](https://raw.githubusercontent.com/SWC-OSG-Workshop/OSG-UserTraining-RMACC17/gh-pages/novice/DHTC/Images/queue_arg_set.png)
+-->
 
-    $ cd ../Example2
-    $ cat  ScalingUp-PythonCals.submit
+In the previous example, we did not pass any arguments to the program, 
+so it used randomly-generated boundary conditions for each job. 
+If we have some idea about where the minimum/maximum is, we can 
+supply boundary conditions to the calculation as arguments by specifying 
+them in the `arguments` line of the submit file. The `queue` command has 
+additionaly options that allow us to submit a job for each of many sets of 
+parameters (passed as arguments into our main executable, which passes them 
+to our python script), ALL with just a single submit file. 
+
+Take a look at the job description file in Example4. 
+
+    $ cd ../Example4
+    $ cat ScalingUp-PythonCals.submit
     
     [...]
-    #Supply arguments 
-    arguments = -9 9 -9 9
+    arguments = $(x_low) $(x_high) $(y_low) $(y_high)
 
-    # Queue is the "start button" - it launches any jobs that have been
-    # specified thus far.
-    queue
-
-    arguments = -8 8 -8 8
-    queue 
-
-    arguments = -7 7 -7 7
-    queue 
-    [...]
-
-A major part of the job description file looks the same as the previous example. The main difference is that the addition of `arguments` keyword. Each time the queue command appears in the script, the expression(s) before the queue would be added to the job description. 
-
-Let us submit the above job
-
-    $ condor_submit ScalingUp-PythonCals.submit
-    Submitting job(s)..........
-    9 job(s) submitted to cluster 329838.
-
-Apply your `condor_q` and `connect watch` knowledge to see this job progress. After all jobs finished, execute the `post_process.sh`  script to sort the results. 
-    ./post_process.sh
- -->
-
-## Variable Expansion via `queue` Keyword
-
-![fig 5](https://raw.githubusercontent.com/SWC-OSG-Workshop/OSG-UserTraining-RMACC17/gh-pages/novice/DHTC/Images/queue_arg_set.png)
-
-In the previous example, we did not pass any argument to the program and it used randomly-generated boundary conditions. If we have some idea about where the minimum/maximum is, we can supply boundary conditions to the calculation through arguments. To get a better idea of what are good boundary conditions, we want to scan over a number of boundary parameter sets. The `queue` command allows us to submit a job for each possible boundary condition we want to test using a single submit file. 
-
-Take a look at the job description file in Example3. 
-
-    $ cd ../Example3
-    $ cat ScalingUp-PythonCals.submit
-    [...]
-    queue arguments from (
-    -9 9 -9 9 
-    -8 8 -8 8 
-    -7 7 -7 7 
-    -6 6 -6 6 
-    -5 5 -5 5 
-    -4 4 -4 4 
-    -3 3 -3 3 
-    -2 2 -2 2 
-    -1 1 -1 1 
+    queue x_low x_high y_low y_high from (
+    -9 9 -9 9
+    -8 8 -8 8
+    -7 7 -7 7
+    -6 6 -6 6
+    -5 5 -5 5
+    -4 4 -4 4
+    -3 3 -3 3
+    -2 2 -2 2
+    -1 1 -1 1
     )
 
-Let us submit the above job
+Now, submit the jobs:
 
     $ condor_submit ScalingUp-PythonCals.submit
-    Submitting job(s)..........
-    9 job(s) submitted to cluster 329839.
 
 Apply your `condor_q` and `watch` knowledge to see this job progress. After all jobs finished, execute the `post_process.sh`  script to sort the results. 
 
     ./post_process.sh
 
-In fact, we could define variables and assign them to HTCondor's expression. This is illustrated in Example 4. 
+### Parameter Table in a Separate File
+Because HTCondor queue statement is fairly flexible, we could have 
+separated the parameter values on each line of the submit file
+with commas and/or spaces. 
 
-    $ cd ../Example4
-    $ cat ScalingUp-PythonCals.submit
+We could even define the same variables, 
+but list them, instead, in a separate file, in which case our submit
+file would look like the below: 
 
     [...]
     arguments = $(x_low) $(x_high) $(y_low) $(y_high)
 
-    # Queue keyword  
-    queue x_low x_high y_low y_high from (
+    queue x_low x_high y_low y_high from params.txt
+ 
+And our separate file (params.txt) would need to include the 
+same one-line-per-job set of parameters:
+
     -9 9 -9 9 
     -8 8 -8 8 
     -7 7 -7 7 
@@ -229,23 +224,24 @@ In fact, we could define variables and assign them to HTCondor's expression. Thi
     -3 3 -3 3 
     -2 2 -2 2 
     -1 1 -1 1 
-    )
 
-The `queue` command defines the variables `x_low`, `x_high`, `y_low`, and `y_high`. These variables are passed on to the argument command (`arguments = $(x_low) $(x_high) $(y_low) $(y_high)`). 
- 
-Let us submit the above job
+Make sure to check out the HTCondor User Tutorial and below Challenges for discussion of several more options for 
+communicating the submission (and variations) of many jobs.
 
-    $ condor_submit ScalingUp-PythonCals.submit
-    Submitting job(s)..........
-    9 job(s) submitted to cluster 329840.
+## Challenges
 
-Apply your `condor_q` and `watch` knowledge to see this job progress. After all jobs finished, execute the `post_process.sh`  script to sort the results. 
+* If the list of parameters became large (more jobs and/or more parameters per job), we might want to instead create a different parameter file for each job, whose filename would need to be listed under `transfer_input_files` and `arguments` (with change to our python code, as well). Can you identify two ways to accomplish this goal, based upon the options described in the (HTCondor User Tutorial)[https://agenda.hep.wisc.edu/event/1201/session/4/contribution/5/material/slides/1.pdf]?
 
-    ./post_process.sh
+* What if you wanted to have the input parameter files for all jobs (from the above challenge) staged in a dedicated `parameters` folder within the submission directory (similar to how the log/err/out files are in a separate `Logs` folder? (Hint: see the HTCondor User Tutorial, again.)
+
+* What if you wanted each job's input parameter file and created output file of results to be in a different directory for each job? (Hint: see the `InitialDir` option in the HTCondor User Tutorial.)
+
 
 ## Beyond the `queue` Keyword
 
-For larger workloads, with more than 100 jobs or job interdependencies, there are a couple tools (DAGMan and Pegasus) that we recommend using.
+For the largest workloads (more than ~10,000 jobs at a a time) or multi-step workflows 
+with jobs that need to be submitted automatically in some sequence, there are workflow 
+creation/management tools ((HTCondor's DAGMan)[] and (Pegasus)[]) that we recommend using.
 
 <!-- <div class="keypoints" markdown="1">
 #### Key Points
