@@ -129,7 +129,7 @@ If we want to submit several jobs, we need to track log, out and error files for
     request_memory = 1 GB
     request_disk = 1 GB
     
-    # We'll queue 10 test jobs, to start, each of which should hae different
+    # We'll queue 10 test jobs, to start, each of which should have different
     #  randomly generated bounds on the optimization parameter space.
     queue 10
 
