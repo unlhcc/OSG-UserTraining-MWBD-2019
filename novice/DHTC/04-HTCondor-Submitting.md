@@ -226,7 +226,7 @@ Then select a slot name from the left column, and examine the `condor_status -l`
 
 HTCondor takes a list of classads from jobs and from compute nodes and then tries to make the classads with job requirements with the classads with compute node capabilities. When the two match, HTCondor will run the job on the compute node.
 
-## A More Standard OSG Submit File
+## A More Typical OSG Job
 
 You can make use any of these attributes in your submit file "Requirements" line to limit where your jobs go, but know that doing so will mean that your jobs match to fewer 'slots', so you'll have less throughput across a batch of many jobs. The `osg-template-job.submit` file is an example of a fairly complete OSG job which you can use as a template submit script when getting started on OSG. Note the `Requirements` and `requests_*` lines.
 
