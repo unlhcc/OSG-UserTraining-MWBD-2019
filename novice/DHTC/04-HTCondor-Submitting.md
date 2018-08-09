@@ -12,11 +12,11 @@ title: Job Scheduling with HTCondor
 
 ## Overview
 
-In this section, we will learn the basics of HTCondor in submitting and monitoring workloads, or "jobs", which is extremely similar to job submission using other queueing systems, but differs in some ways that make HTC a lot easier. The typical cycle for a set of HTC jobs is:
+In this section, we will learn the basics of submitting and monitoring computing "jobs" with HTCondor, which is extremely similar to job submission using other queueing systems, but differs in some ways that make HTC a lot easier. The typical cycle for a set of HTC jobs is:
 
-1. Job(s) submitted to the queue on the submit server.
-2. Job is matched to an execute server and user-indicated files transfered to a temporary job working directory.
-3. Job executable is executed in the job working directory on the execute server (executable needs to create output files in the 'current' or 'present' directory).
+1. Job(s) are submitted to the queue on the submit server.
+2. A job is matched to an execute server and user-indicated files transfered to a temporary job working directory.
+3. The job executable is executed in the job working directory on the execute server (executable needs to create output files in the 'current' or 'present' directory).
 4. HTCondor captures any executable errors and terminal output/error information, and transfers all newly-created files back to the submission directory on the submit server.
 
 In HTCondor the job submit file (separate from the job executable) communicates how many jobs to submit, what data to transfer to the job, and the resource requirements of the job(s).
@@ -75,28 +75,31 @@ Since this is a simple script, we can test it on the submit server. (It's import
 Next we will create a simple (though verbose with comments) HTCondor submit file.  A submit file tells the HTCondor _how_ to run your workload, with what properties and arguments, and, optionally, how to return output to the submit host.
 
     $ cat tutorial01.submit
-    
-    # The UNIVERSE defines an execution environment. You will almost always use VANILLA.
-    Universe = vanilla
-    
-    # EXECUTABLE is the program your job will run It's often useful
-    # to create a shell script to "wrap" your actual work.
-    Executable = short.sh
-    
-    # ERROR and OUTPUT are the error and output channels from your job
-    # that HTCondor returns from the remote host.
-    Error = job.error
-    Output = job.output
-    
-    # The LOG file is where HTCondor places information about your
-    # job's status, success, and resource consumption.
-    Log = job.log
-    
-    # QUEUE is the "start button" - it launches any jobs that have been
-    # specified thus far.
+
+    # Our executable is the main program or script that we've created
+    # to do the 'work' of a single job. If we have any arguments to pass,
+    # those are listed on a separate line.
+    executable = short.sh
+    arguments = 
+
+    # We need to name the files that HTCondor should create to save the
+    #  terminal output (stdout) and error (stderr) created by our job.
+    #  Similarly, we need to name the log file where HTCondor will save
+    #  information about job execution steps.
+    error = short.error
+    output = short.output
+    log = short.log
+
+    # We need to request the resources that this job will need:
+    request_cpus = 1
+    request_memory = 1 MB
+    request_disk = 1 MB
+
+    # The last line of a submit file indicates how many jobs of the above
+    #  description should be queued. We'll start with one job.
     queue 1
 
-### Job Submission
+## Job Submission
 
 Submit the job using `condor_submit`.
 
@@ -143,7 +146,7 @@ You can also get status on a specific job `cluster`(which includes all jobs from
 
 Note the ST (state) column. Your job will be in the `I` state (idle) if it hasn't started yet. If it's running, it will have state `R` (running). If it has completed already, it will not appear in `condor_q`.
 
-Let's wait for your job to finish – that is, for `condor_q` not to show the job in its output. A useful tool for this is `watch`. It runs a program repeatedly, letting you see how the output changes. Let's submit the job again, and `watch` the condor_q output at two-second intervals:
+Let's wait for our job to finish, at which point it will be no longer visible in the `condor_q` output. A useful tool for this is `watch`, which runs a program repeatedly, letting you see how the output changes. Let's submit the job again, and `watch` the condor_q output at two-second intervals:
 
     $ condor_submit tutorial01.submit
     Submitting job(s). 
@@ -153,34 +156,34 @@ Let's wait for your job to finish – that is, for `condor_q` not to show the jo
 
 When your job has completed, it will disappear from the list.  To close `watch`, hold down Ctrl and press C.
 
-### Job History
-
-Once your job has finished, you can get information about its execution
-from the `condor_history` command:
-
-    $ condor_history 1144
-    ID     OWNER          SUBMITTED   RUN_TIME     ST COMPLETED   CMD            
-    1144.0   osguser50       3/6  00:17   0+00:00:27 C   3/6  00:28 /share/training/..
-
-You can see much more information about your job's final status using the `-long` option. To close the work of `condor_history` (as it may keep traversing the very long history of jobs on this submit server), use Ctrl-C, as you did for the `watch` command.
-
 ### Job Output
 
 Once your job has finished, you can look at the files that HTCondor has returned to the working directory. If everything was successful, it should have returned:
 
-* `job.output`: An output file for each job's terminal-printed output ("standard output")
-* `job.error`: An error file for any error messages ("standard error")
-* `job.log`: A log file for each job's HTCondor logging information
+* `short.output`: An output file for each job's terminal-printed output ("standard output")
+* `short.error`: An error file for any error messages ("standard error")
+* `short.log`: A log file for each job's HTCondor logging information
 
 Read the output file, which should show something like the below:
 
-    $ cat job.output
+    $ cat short.output
     Start time: Wed Mar  8 18:16:04 CST 2017
     Job is running on node: cmswn2300.fnal.gov
     Job running as user: uid=12740(osg) gid=9652(osg) groups=9652(osg)
     Job is running in directory: /storage/local/data1/condor/execute/dir_2031614/glide_6B4s2O/execute/dir_887949
     Working hard...
     Science complete!
+
+
+### Job History
+
+You can also get information about completed jobs; just use the `condor_history` command:
+
+    $ condor_history 1144
+    ID     OWNER          SUBMITTED   RUN_TIME     ST COMPLETED   CMD            
+    1144.0   osguser50       3/6  00:17   0+00:00:27 C   3/6  00:28 /share/training/..
+
+You can see much more information about your job's final status using the `-long` option. To close the work of `condor_history` (as it may keep traversing the very long history of jobs on this submit server), use Ctrl-C, as you did for the `watch` command.
 
 
 ### Removing Jobs
@@ -223,63 +226,9 @@ Then select a slot name from the left column, and examine the `condor_status -l`
 
 HTCondor takes a list of classads from jobs and from compute nodes and then tries to make the classads with job requirements with the classads with compute node capabilities. When the two match, HTCondor will run the job on the compute node.
 
-## A Standard OSG Submit File
+## A More Standard OSG Submit File
 
 You can make use any of these attributes in your submit file "Requirements" line to limit where your jobs go, but know that doing so will mean that your jobs match to fewer 'slots', so you'll have less throughput across a batch of many jobs. The `osg-template-job.submit` file is an example of a fairly complete OSG job which you can use as a template submit script when getting started on OSG. Note the `Requirements` and `requests_*` lines.
-
-
-    # The UNIVERSE defines an execution environment. You will almost always use VANILLA.
-    Universe = vanilla
-
-    # These are good base requirements for your jobs on OSG. It is specific on OS and
-    # OS version, core count and memory, and wants to use the software modules. 
-    Requirements = OSGVO_OS_STRING == "RHEL 6" && Arch == "X86_64" && HAS_MODULES == True
-    request_cpus = 1
-    request_memory = 1 GB
-    request_disk = 10 GB
-
-    # EXECUTABLE is the program your job will run It's often useful
-    # to create a shell script to "wrap" your actual work.
-    Executable = short.sh
-    Arguments = 
-
-    # ERROR and OUTPUT are the error and output channels from your job
-    # that HTCondor returns from the remote host. $(Cluster) is the 
-    # ID HTCondor assigns to the job and $(Process) is the ID HTCondor
-    # assigns within a set of jobs.
-    Error = job.$(Cluster).$(Process).error
-    Output = job.$(Cluster).$(Process).output
-
-    # The LOG file is where HTCondor places information about your
-    # job's status, success, and resource consumption.
-    Log = job.log
-
-    # Send the job to Held state on failure. 
-    on_exit_hold = (ExitBySignal == True) || (ExitCode != 0)  
-
-    # Periodically retry the jobs every 60 seconds, up to a maximum of 5 retries.
-    periodic_release = (NumJobStarts < 5) && ((CurrentTime - EnteredCurrentStatus) > 60)
-
-    # QUEUE is the "start button" - it launches any jobs that have been
-    # specified thus far.
-    queue 1
-
-
-You can test this job by submitting and monitoring it as we have just covered:
-
-    $ condor_submit osg-template-job.submit
-    Submitting job(s).
-    1 job(s) submitted to cluster 1151
-
-
-The filenames for this job include the 'cluster' and 'process' values of the job ID, which means that if you submit more
-than one job, they will all have unique output and error files. (This is just one way to distinguish job's by their filenames or other 'ingredients'. We'll see more examples later.)
-
-    $ ls *.output
-    job.output
-    job.1151.0.output
-
-## A More Advanced OSG Job
 
 For any script or job you want to run, you will usually want to do one or several of the following things: pass input parameters to a script, use input file, and produce an output file. Open the example script `short_with_input_output_transfer.sh` with `cat`:
 
@@ -301,72 +250,56 @@ This is a shell script that is similar to the above example. The main difference
     sleep 20
     echo "Science complete!"
 
-With this setup will have to transfer the input file to the remote worker node, pass the input file as a command line argument, and then transfer the output file back. We do all these things in the example submit file `osg-template-job-input-and-transfer.submit`:
+A to run the `short_with_input_output_transfer.sh` script will need to transfer the input file to the remote worker node, pass the input filename as a command line argument, and then transfer the output file back. We do all these things in the example submit file `tutorial02.submit`:
 
-    # The UNIVERSE defines an execution environment. You will almost always use VANILLA.
-    Universe = vanilla
-    
-    # These are good base requirements for your jobs on OSG. It is specific on OS and
-    # OS version, core count and memory, and wants to use the software modules. 
-    Requirements = OSGVO_OS_STRING == "RHEL 6" && Arch == "X86_64" && HAS_MODULES == True
+    # We need the job to run our executable script, with the
+    #  input.txt filename as an argument, and to transfer the
+    #  relevant input and output files:
+    executable = short_with_input_output_transfer.sh
+    arguments = input.txt
+    transfer_input_files = input.txt
+    transfer_output_files = output.txt
+
+    # This time, let's specify unique filenames for each job by using
+    #  the job 'cluster' and 'process' values.
+    error = job.$(Cluster).$(Process).error
+    output = job.$(Cluster).$(Process).output
+    log = job.$(Cluster).$(Process).log
+
+    # The below are good base requirements for first testing jobs on OSG, 
+    #  if you don't have a good idea of memory and disk usage. Though we 
+    #  don't actually need them for our shell script, we'll also require
+    #  servers that have the OSG software modules:
     request_cpus = 1
     request_memory = 1 GB
-    
-    # EXECUTABLE is the program your job will run It's often useful
-    # to create a shell script to "wrap" your actual work.
-    Executable = short_with_input.sh
-    
-    # ERROR and OUTPUT are the error and output channels from your job
-    # that HTCondor returns from the remote host. $(Cluster) is the 
-    # ID HTCondor assigns to the job and $(Process) is the ID HTCondor
-    # assigns within a set of jobs. 
-    Error = job.$(Cluster).$(Process).error
-    Output = job.$(Cluster).$(Process).output
-    
-    # The LOG file is where HTCondor places information about your
-    # job's status, success, and resource consumption.
-    Log = job.log
-    
-    # Send the job to Held state on failure. 
+    request_disk = 1 GB
+    Requirements = HAS_MODULES == True
+
+    # A useful HTCondor trick when running many jobs across the 
+    #  heterogeneous OSG servers is to have any failed jobs held 
+    #  and released to re-run after a short time (up to five times)
+    #  so that they might succeed on another execute server:
     on_exit_hold = (ExitBySignal == True) || (ExitCode != 0)  
-    
-    # Periodically retry the jobs every 60 seconds, up to a maximum of 5 retries.
-    periodic_release =  (NumJobStarts < 5) && ((CurrentTime - EnteredCurrentStatus) > 60)
+    periodic_release = (NumJobStarts < 5) && ((CurrentTime - EnteredCurrentStatus) > 60)
 
-    # TRANSFER_INPUT_FILES defines which files should be transferred to the job. 
-    # Please note that this should only be used for relatively small files
-    transfer_input_files = input.txt
-
-    # TRANSFER_OUTPUT_FILES defines which files should be transferred from the job back to 
-    # the submit host. 
-    # Please note that this should only be used for relatively small files
-    transfer_output_files = output.txt
-    
-    # ARGUMENTS is a way to pass command line input to the EXECUTABLE
-    arguments = input.txt
-
-    # QUEUE is the "start button" - it launches any jobs that have been
-    # specified thus far.
+    # Let's queue one job with the above:
     queue 1
 
-You can test this job by submitting and monitoring it as we have just covered:
+You can test this job by submitting and monitoring it as we did for prior jobs:
 
     $ condor_submit osg-template-job-input-and-transfer.submit
     Submitting job(s).
     1 job(s) submitted to cluster 1152
 
-The filenames for this job includes a job id, which means that if you submit more
-than one job, they will all have unique outputs.
+The files for the terminal error and output have filenames including the job cluster and process numbers (which make up the unique Job ID number of each job), so that each job's files are unique from other jobs (and don't overwrite each other). You can see these new files (and contents) with
 
-    $ ls *.output
-    job.output
-    job.1151.0.output
-    job.1152.0.output
+    $ ls
+    $ cat job.*.output
 
-There will also be an `output.txt` in the directory:
+There will also be an `output.txt` in the directory, which was created by our job from `input.txt`:
 
     $ ls output.txt
-    output.txt
+    $ cat output.txt
 
 ## Challenges
 
@@ -378,10 +311,6 @@ There will also be an `output.txt` in the directory:
 * `condor_history -long username` gives a LOT of extended information about your past jobs, ordered as key-value pairs.  Try it with your a single job from your last cluster:
 
     $ condor_history -long ######.0
-
-
-    Included among these attributes is the `RemoteWallClockTime` parameter, which tells how long your job ran on the remote worker.  How might you
-collect this value across all your historical jobs? (Remember that the `grep` command can be used to pick out specific patterns from text.)
 
 <!-- <div class="keypoints" markdown="1">
 
