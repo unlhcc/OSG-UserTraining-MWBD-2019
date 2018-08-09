@@ -308,7 +308,7 @@ and HTCondor will automatically detect the rescue DAG and use it to only submit 
 
 <h4> Submission Tuning </h4>
 
-One additional feature of DAGMan is that you are able to tune how many total jobs to have sitting in the queue or how fast jobs are submitted to the cluster. This is especially important if you have fairly large number of jobs, i.e. more than 10000. HTCondor can handle up to 200000 jobs in the queue simultaneously, but only on dedicated and specialized hardware. To accomodate other users on the OSG Connect system and reduce stress on the system, we recommend that you keep less than 30000 jobs in the queue in the idle state. 
+One additional feature of DAGMan is that you are able to tune how many total jobs to have sitting in the queue or how fast jobs are submitted to the cluster. This is especially important if you have fairly large number of jobs. To accomodate other users on the OSG Connect system and reduce stress on the system, we recommend that you keep less than 10,000 jobs in the queue in the idle state. 
 
 DAGMan can be configured to allow you operate within those limits. The simplest way is to pass a text file with your configuration parameters to `condor_submit_dag`: `condor_submit_dag -config dagman.config your_dag.dag`. The configuration file will look something like:
 
@@ -370,9 +370,9 @@ If we now submit the DAG:
     -----------------------------------------------------------------------
     
 
-Let's monitor the job status every two seconds. (Recall `connect watch` from a previous lesson.)
+Let's monitor the job status every two seconds.
 
-    $ connect watch 2
+    $ watch -n2 condor_q -nobatch 
 
     -- Submitter: login01.osgconnect.net : <192.170.227.195:48781> : login01.osgconnect.net
     ID      OWNER            SUBMITTED     RUN_TIME ST PRI SIZE CMD               
@@ -435,6 +435,10 @@ The input files, job submission files and execution scripts of the jobs are loca
 	$ cd tutorial-dagman-namd/X-DAG
 
 Again we are missing the `.dag` file here. See if you can write the DAG file for this example. Hint: Does the job in the center actually need to do anything (is it a NOOP in programming speak)? Check the DAGMan docs!
+
+## Challenges
+
+* What happens if you introduce a cycle in a DAG? Modify one of the `.dag` files and see what happens. Do you get an error at submit time? How about in the `.dag.dagman.out` file?
 
 <div class="keypoints" markdown="1">
 #### Key Points
