@@ -1,4 +1,4 @@
-The webpage is located at https://swc-osg-workshop.github.io/OSG-UserTraining-RMACC18
+The webpage is located at https://swc-osg-workshop.github.io/OSG-UserTraining-TheQuilt2018
 
 # Software Carpentry - Open Science Grid (SWC-OSG) Workshop
 
