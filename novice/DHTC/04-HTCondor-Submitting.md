@@ -83,20 +83,19 @@ Since this is a simple script, we can test it on the submit server. (It's import
 Next we will create a simple (though verbose with comments) HTCondor submit file.  A submit file tells the HTCondor _how_ to run your workload, with what properties and arguments, and, optionally, how to return output to the submit host.
 
     $ cat tutorial01.submit
-
     # Our executable is the main program or script that we've created
-    # to do the 'work' of a single job. If we have any arguments to pass,
-    # those are listed on a separate line.
+    # to do the 'work' of a single job.
     executable = short.sh
-    arguments = 
 
     # We need to name the files that HTCondor should create to save the
     #  terminal output (stdout) and error (stderr) created by our job.
     #  Similarly, we need to name the log file where HTCondor will save
     #  information about job execution steps.
-    error = short.error
-    output = short.output
-    log = short.log
+    #  We'll specify unique filenames for each job by using
+    #  the job's 'cluster' value.
+    error = short.$(Cluster).error
+    output = short.$(Cluster).output
+    log = short.$(Cluster).log
 
     # We need to request the resources that this job will need:
     request_cpus = 1
@@ -126,7 +125,7 @@ The `condor_q` command tells the status of not-yet-completed jobs. We have submi
 
     -- Schedd: training.osgconnect.net : <192.170.227.119:9618?... @ 06/30/17 15:17:51
     OWNER    BATCH_NAME       SUBMITTED   DONE   RUN    IDLE  TOTAL JOB_IDS
-    username CMD: short.sh   6/30 15:17      _      _      1      1 1872.0
+    username CMD: short.sh   6/30 15:17      _      _      1      1 1144.0
 
     1 jobs; 0 completed, 0 removed, 1 idle, 0 running, 0 held, 0 suspended 
 
@@ -136,7 +135,7 @@ The default `condor_q` output format "batches" similar jobs together, which will
 
     -- Schedd: training.osgconnect.net : <192.170.227.119:9618?... @ 06/30/17 15:19:21
      ID      OWNER            SUBMITTED     RUN_TIME ST PRI SIZE CMD
-    1873.0   rynge           6/30 15:19   0+00:00:00 I  0    0.0 short.sh
+    1144.0   username         6/30 15:19   0+00:00:00 I  0    0.0 short.sh
 
     1 jobs; 0 completed, 0 removed, 1 idle, 0 running, 0 held, 0 suspended 
 
@@ -168,13 +167,13 @@ When your job has completed, it will disappear from the list.  To close `watch`,
 
 Once your job has finished, you can look at the files that HTCondor has returned to the working directory. If everything was successful, it should have returned:
 
-* `short.output`: An output file for each job's terminal-printed output ("standard output")
-* `short.error`: An error file for any error messages ("standard error")
-* `short.log`: A log file for each job's HTCondor logging information
+* `short.1144.output`: An output file for each job's terminal-printed output ("standard output")
+* `short.1144.error`: An error file for any error messages ("standard error")
+* `short.1144.log`: A log file for each job's HTCondor logging information
 
 Read the output file, which should show something like the below:
 
-    $ cat short.output
+    $ cat short.1144.output
     Start time: Wed Mar  8 18:16:04 CST 2017
     Job is running on node: cmswn2300.fnal.gov
     Job running as user: uid=12740(osg) gid=9652(osg) groups=9652(osg)
@@ -189,7 +188,7 @@ You can also get information about completed jobs; just use the `condor_history`
 
     $ condor_history 1144
     ID     OWNER          SUBMITTED   RUN_TIME     ST COMPLETED   CMD            
-    1144.0   osguser50       3/6  00:17   0+00:00:27 C   3/6  00:28 /share/training/..
+    1144.0   username       3/6  00:17   0+00:00:27 C   3/6  00:28 /share/training/..
 
 You can see much more information about your job's final status using the `-long` option. To close the work of `condor_history` (as it may keep traversing the very long history of jobs on this submit server), use Ctrl-C, as you did for the `watch` command.
 
@@ -240,7 +239,7 @@ You can make use any of these attributes in your submit file "Requirements" line
 
 For any script or job you want to run, you will usually want to do one or several of the following things: pass input parameters to a script, use input file, and produce an output file. Open the example script `short_with_input_output_transfer.sh` with `cat`:
 
-    $ cat short_with_input_output_transfer.sh
+    $ cat short_transfer.sh
 
 This is a shell script that is similar to the above example. The main difference is that this script takes a text file as a command line argument argument, i.e. $1, and produces an output file that is the copy of the input file, i.e. cat $1 > output.txt.
 
@@ -263,7 +262,7 @@ A to run the `short_with_input_output_transfer.sh` script will need to transfer 
     # We need the job to run our executable script, with the
     #  input.txt filename as an argument, and to transfer the
     #  relevant input and output files:
-    executable = short_with_input_output_transfer.sh
+    executable = short_transfer.sh
     arguments = input.txt
     transfer_input_files = input.txt
     transfer_output_files = output.txt
@@ -281,21 +280,13 @@ A to run the `short_with_input_output_transfer.sh` script will need to transfer 
     request_cpus = 1
     request_memory = 1 GB
     request_disk = 1 GB
-    Requirements = HAS_MODULES == True
-
-    # A useful HTCondor trick when running many jobs across the 
-    #  heterogeneous OSG servers is to have any failed jobs held 
-    #  and released to re-run after a short time (up to five times)
-    #  so that they might succeed on another execute server:
-    on_exit_hold = (ExitBySignal == True) || (ExitCode != 0)  
-    periodic_release = (NumJobStarts < 5) && ((CurrentTime - EnteredCurrentStatus) > 60)
 
     # Let's queue one job with the above:
     queue 1
 
 You can test this job by submitting and monitoring it as we did for prior jobs:
 
-    $ condor_submit osg-template-job-input-and-transfer.submit
+    $ condor_submit tutorial02.submit
     Submitting job(s).
     1 job(s) submitted to cluster 1152
 
@@ -314,7 +305,6 @@ There will also be an `output.txt` in the directory, which was created by our jo
 * What happens if we leave the `queue` line out of a submit file?
 
 * What happens if we write only `queue`, with no argument?
-
 
 * `condor_history -long username` gives a LOT of extended information about your past jobs, ordered as key-value pairs.  Try it with your a single job from your last cluster:
 
