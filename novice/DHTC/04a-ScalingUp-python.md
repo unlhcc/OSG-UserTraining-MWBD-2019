@@ -99,38 +99,36 @@ Now let us take a look at job description file
 If we want to submit several jobs, we need to track log, out and error files for each job. An easy way to do this is to add the `$(Cluster)` and `$(Process)` variables to the file names. 
 
     # We can indicate the location of our executable, since it
-    #  exists one directory level up. We'll let these first tests 
+    #  exists one directory level up. We'll let these first tests
     #  run our python script without giving it any arguments.
     executable = ../scalingup-python-wrapper.sh
-    
-    # Similarly, we can indicate the location of any other files 
+
+    # Similarly, we can indicate the location of any other files
     #  that will need to be transfered into the job working directory.
     #  If we don't specify which output files to transfer back,
     #  HTCondor will just transfer back any new *files* from the job's
     #  working directory:
     transfer_input_files = ../rosen_brock_brute_opt.py
-    
-    # Additionally, we can indicate that our out/err/log files should 
+
+    # Additionally, we can indicate that our out/err/log files should
     #  be created by HTCondor within a subdirectory (or other location)
     #  so that they don't clog up our submission directory:
     output = Log/job.out.$(Cluster).$(Process)
     error = Log/job.error.$(Cluster).$(Process)
     log = Log/job.log.$(Cluster).$(Process)
-    
-    # We'll use that trick to hold and release (to re-run) any jobs that
-    #  happen to fail, in case their execute server was just missing some 
-    #  dependencies of our python program: 
-    on_exit_hold = (ExitBySignal == True) || (ExitCode != 0)
-    PeriodicRelease = ( (CurrentTime - EnteredCurrentStatus) > 600) ) && (NumJobStarts < 5)
-    
+
     # Since we don't know the resource needs of our jobs, yet, we'll start with the below:
-    # Requirements = OSGVO_OS_STRING == "RHEL 6" && HAS_MODULES == True                           
     request_cpus = 1
     request_memory = 1 GB
     request_disk = 1 GB
-    
-    # We'll queue 10 test jobs, to start, each of which should have different
-    #  randomly generated bounds on the optimization parameter space.
+    Requirements = OSGVO_OS_STRING == "RHEL 6" && TARGET.Arch == "X86_64" && HAS_MODULES == True
+
+    # We'll use that trick to hold and release (to re-run) any jobs that
+    #  happen to fail, in case their execute server was just missing some
+    #  dependencies of our python program:
+    on_exit_hold = (ExitBySignal == True) || (ExitCode != 0)
+    PeriodicRelease = ( (CurrentTime - EnteredCurrentStatus) > 120 ) && (NumJobStarts < 5)
+
     queue 10
 
 Note the `queue 10`. This tells HTCondor to queue 10 jobs (with unique process values) under one cluster number.  
@@ -145,7 +143,7 @@ Apply your `condor_q` and `watch` (`watch -n2 condor_q $USER`) knowledge to see 
 
 ## Other ways to use the `queue` command
 
-Now we will explore another way to use `queue` command, which is just one of several  
+Now we will explore another way to use the `queue` command, which is just one of several  
 described well in the (HTCondor Week User Tutorial)[https://agenda.hep.wisc.edu/event/1201/session/4/contribution/5/material/slides/1.pdf] (and in the HTCondor Manual)[http://research.cs.wisc.edu/htcondor/manual/current/2_5Submitting_Job.html#SECTION00352000000000000000].
 
 In the previous example, 
@@ -177,7 +175,7 @@ Take a look at the job description file in Example4.
     
     [...]
     arguments = $(x_low) $(x_high) $(y_low) $(y_high)
-
+    [...]
     queue x_low x_high y_low y_high from (
     -9 9 -9 9
     -8 8 -8 8
