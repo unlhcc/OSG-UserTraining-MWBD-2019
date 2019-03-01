@@ -1,11 +1,11 @@
 ---
 layout: workshop
 root: .
-venue: High-Throughput Computation on the Open Science Grid
+venue: Open Science Grid Workshop @ Jefferson Lab
 address: Jefferson Laboratory, Newport News, VA
 country: United States
 humandate: March 21, 2019
-humantime: 8:45 am - 12:00 pm
+humantime: 8:45 am - 12:30 pm
 startdate: MAR-21-2019
 enddate: MAR-21-2019
 latlng: 28.468,-81.469
@@ -45,7 +45,17 @@ cloud resources. Topics to include:
 Introduction to the OSG; Job Scheduling with HTCondor; Scaling Up
 Workloads; Managing data
 </p>
-  
+
+<h2>Requirements</h2>
+
+<p>Setting
+
+Accounts, Register, links to shell materials
+
+
+
+<h2>General Information</h2>
+
 <!-- This block displays the instructors' names if they are available. -->
 {% if page.instructor %}
 <p>
@@ -54,30 +64,6 @@ Workloads; Managing data
 </p>
 {% endif %}
 
-<!-- This block displays the helpers' names if they are available. -->
-<!--
-{% if page.helper %}
-<p>
-  <strong>Helpers:</strong>
-  {{page.helper | join: ', ' %}}
-</p>
-{% endif %}
--->
-
-<!--
-    Modify this block to reflect the target audience for your bootcamp.
-    In particular, if it is only open to people from a particular institution,
-    or if specialized prerequisite knowledge is required, please mention that.
--->
-<!--
-<p>
-  <strong>Who:</strong>
-  The course is aimed at graduate students, post-doctoral researchers and other researchers.
-</p>
--->
-<!--
-    This block displays the address and links to a map showing directions.
--->
 <p>
   <strong>Where:</strong>
   {{ page.address }}.
@@ -108,10 +94,23 @@ Workloads; Managing data
 </p>
 
 
+<h2>Setup Instructions </h2>
+<p>
+  <a href="setup.html">Instructions to set up the required software on Linux, Windows and Mac laptops</a>
+</p>
+<hr/> 
+
 <hr/>
 
 <h2>Schedule</h2>
 <h2> </h2>
+
+<ul>
+<li>Introduction: What is the Open Science Grid and High Throughput Computing?</li>
+<li>Hands-on: Submitting jobs to the Open Science Grid</li>
+<li>Further considerations: Getting the most out of the Open Science Grid</li>
+</ul>
+<!--
 <div class="row-fluid">
     <table class="table table-striped">
         <tr> <td>1:00 - 1:25 </td> <td> <a href="novice/DHTC/01-IntroGrid.html">Introduction to the Open Science Grid </a> &nbsp;&nbsp; [<a href="https://drive.google.com/open?id=1IYeME2JANfV4MxmgMWQlnFSdyULBrbrA">(Slides)</a>]</td> </tr>
@@ -124,18 +123,9 @@ Workloads; Managing data
     </table>
   </div>
 <hr/>
-
-
-
-<!--
-    Edit this block to show what topics will be covered.
 -->
 
-<h2>Setup Instructions </h2>
-<p>
-  <a href="setup.html">Instructions to set up the required software on Linux, Windows and Mac laptops</a>
-</p>
-<hr/> 
+
 
 <!--
 <h2>Feedback</h2>
@@ -145,8 +135,3 @@ Workloads; Managing data
 <hr/>
 -->
 
-
-<!--
-    Edit the setup instructions in _includes/setup.html to reflect your bootcamp.
-    (In particular, most bootcamps teach either Python or R, not both.)
--->
