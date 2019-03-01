@@ -20,24 +20,6 @@ contact: user-support@opensciencegrid.org
     Edit the values in the parameter block above to be appropriate for your bootcamp.
 -->
 
-
-<h2>General Information</h2>
-
-<p>
-The <a href="http://www.opensciencegrid.org">Open Science Grid</a>
-provides a fabric of services to enable
-distributed, high-throughput computing capabilities across the US. In
-general, OSG is organized into VOs (Virtual Organizations) around large
-experiments, but individual PIs and groups too small for the VO model
-can use the hosted services provided by
-<a href="http://osgconnect.net">OSG Connect</a>.
-</p>
-
-<p>
-The format of this tutorial is a mix of lecture and hands-on exercises, so
-please bring your laptop and make sure you have an SSH client installed.
-<p>
-
 <p>
 The goal of this session is to learn how to run and
 scale up workloads, manage your data and also spill over into Amazon
@@ -46,59 +28,25 @@ Introduction to the OSG; Job Scheduling with HTCondor; Scaling Up
 Workloads; Managing data
 </p>
 
-<h2>Requirements</h2>
-
-<p>Setting
-
-Accounts, Register, links to shell materials
+<h2>Registration</h2>
 
 
 
-<h2>General Information</h2>
+<h2>Preparation </h2>
 
-<!-- This block displays the instructors' names if they are available. -->
-{% if page.instructor %}
-<p>
-  <strong>Instructors:</strong>
-  {{page.instructor | join: ', ' %}}
-</p>
-{% endif %}
-
-<p>
-  <strong>Where:</strong>
-  {{ page.address }}.
+<p>This workshop is hands-on!  While not strictly required, we 
+strongly encourage participants to <b>bring a laptop</b> and make sure you have the following: 
+<ul>
+<li>A "CUE" account, which will give you access to the OSG submission point at the Jefferson Lab</li>
+<li>An ssh/scp tool installed on our laptop.  Instructions to set up the required 
+software on Linux, Windows and Mac laptops is on <a href="setup.html">this page</a></li>
+</ul>
 </p>
 
-<!--
-    Modify the block below if there are any special requirements.
--->
-<p>
-  <strong>Requirements:</strong>
-  Participants must bring a laptop with a few specific software packages installed
-  (see <a href="setup.html">Setup</a>).
-</p>
+<p>If you have limited (or no) experience using the command line, we highly recommend 
+reviewing the <a href="http://swcarpentry.github.io/shell-novice/">Software Carpentry 
+shell lesson</a> before this training, particularly parts 1-3.  </p>
 
-<!--
-    This block automatically inserts a contact email address if one has been specified for the page.
-    If one hasn't, this block inserts the generic contact address for Software Carpentry.
--->
-<p>
-  <strong>Contact</strong>:
-  Please mail
-  {% if page.contact %}
-    <a href='mailto:{{page.contact}}'>{{page.contact}}</a>
-  {% else %}
-    <a href='mailto:{{site.contact}}'>{{site.contact}}</a>
-  {% endif %}
-  for more information.
-</p>
-
-
-<h2>Setup Instructions </h2>
-<p>
-  <a href="setup.html">Instructions to set up the required software on Linux, Windows and Mac laptops</a>
-</p>
-<hr/> 
 
 <hr/>
 
@@ -125,7 +73,54 @@ Accounts, Register, links to shell materials
 <hr/>
 -->
 
+<h2>General Information</h2>
 
+<!-- This block displays the instructors' names if they are available. -->
+{% if page.instructor %}
+<p>
+  <strong>Instructors:</strong>
+  {{page.instructor | join: ', ' %}}
+</p>
+{% endif %}
+
+<p>
+  <strong>Where:</strong>
+  {{ page.address }}.
+</p>
+<!--
+    Modify the block below if there are any special requirements.
+-->
+<p>
+  <strong>Requirements:</strong>
+  Participants should bring a laptop with a few specific software packages installed
+  (see <a href="setup.html">Setup</a>).
+</p>
+<!--
+    This block automatically inserts a contact email address if one has been specified for the page.
+    If one hasn't, this block inserts the generic contact address for Software Carpentry.
+-->
+<p>
+  <strong>Contact</strong>:
+  Please mail
+  {% if page.contact %}
+    <a href='mailto:{{page.contact}}'>{{page.contact}}</a>
+  {% else %}
+    <a href='mailto:{{site.contact}}'>{{site.contact}}</a>
+  {% endif %}
+  for more information.
+</p>
+
+<h2>About the Open Science Grid</h2>
+
+<p>
+The <a href="http://www.opensciencegrid.org">Open Science Grid</a>
+provides a fabric of services to enable
+distributed, high-throughput computing capabilities across the US. In
+general, OSG is organized into VOs (Virtual Organizations) around large
+experiments, but individual PIs and groups too small for the VO model
+can use the hosted services provided by
+<a href="http://osgconnect.net">OSG Connect</a>.
+</p>
 
 <!--
 <h2>Feedback</h2>
