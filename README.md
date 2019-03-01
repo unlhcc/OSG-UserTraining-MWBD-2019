@@ -1,6 +1,13 @@
-The webpage is located at https://swc-osg-workshop.github.io/OSG-UserTraining-TheQuilt2018
+# OSG User Training - Jefferson Lab
 
-# Software Carpentry - Open Science Grid (SWC-OSG) Workshop
+May 21, 2019
+
+For information about the OSG User Training being offered at the Jefferson 
+Laboratory, please go to the training website here: 
+
+https://swc-osg-workshop.github.io/OSG-UserTraining-JLab-2019
+
+## Website Instructions
 
 We work directly on the `gh-pages` as it is useful for the website 
 rendering. GitHub renders the website from the HTML and markdown 
