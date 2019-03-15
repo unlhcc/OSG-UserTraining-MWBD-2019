@@ -61,10 +61,14 @@ wget http://proxy.chtc.wisc.edu/SQUID/osgschool18/location-wrapper.sh \
 
 ### Geolocating machines in the OSG
 
-`location.py` can take a text file that contains a list of locations as an argument, which can be done by collating your output files into a single file. The easiest way to do this is to use the `cat` command from today's exercise 1.2, the `*` wildcard from last exercise and a new operator `>`, which can write command output to a file. If your output files are named `ce_hostname-0.out...ce_hostname-99.out`, your commands would look like this:
+Now that you have your results, it's time to summarize them. Rather than inspecting each output file individually, you can use the cat command to print the results from all of your output files at once. If all of your output files have the format location-#.out (e.g., location-10.out), your command will look something like this:
 
-``` console
-%UCL_PROMPT_SHORT% <strong>cat ce_hostname-*.out > hostnames.txt</strong>
-%UCL_PROMPT_SHORT% <strong>./location.py hostnames.txt</strong>
-```
-v
+user@learn $ cat location-*.out
+
+The * is a wildcard so the above cat command runs on all files that start with location- and end in .out. Additionally, you can use cat in combination with the sort and uniq commands to print only the unique results:
+
+user@learn $ cat location-*.out | sort | uniq
+
+### Mapping your results
+
+To visualize the locations of the machines that your jobs ran on, you will be using http://www.mapcustomizer.com/. Copy and paste the collated results into the text box that pops up when clicking on the 'Bulk Entry' button on the right-hand side. Where did your jobs run?
