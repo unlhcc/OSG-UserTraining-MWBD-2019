@@ -1,0 +1,18 @@
+# We need the job to run our executable script, arguments and files.
+#  Also, we'll specify unique filenames for each job by using
+#  the job's 'cluster' value.
+executable = short_transfer.sh
+arguments = input.txt
+transfer_input_files = input.txt
+transfer_output_files = output.txt
+
+error = log/job.$(Cluster).$(Process).error
+output = log/job.$(Cluster).$(Process).output
+log = log/job.$(Cluster).$(Process).log
+
+request_cpus = 1
+request_memory = 1 GB
+request_disk = 1 GB
+
+# Let's queue ten jobs with the above specifications
+queue 10

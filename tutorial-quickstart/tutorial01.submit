@@ -1,0 +1,21 @@
+# Our executable is the main program or script that we've created
+# to do the 'work' of a single job.
+executable = short.sh
+
+# We need to name the files that HTCondor should create to save the
+#  terminal output (stdout) and error (stderr) created by our job.
+#  Similarly, we need to name the log file where HTCondor will save
+#  information about job execution steps.
+error = short.error
+output = short.output
+log = short.log
+
+# We need to request the resources that this job will need:
+request_cpus = 1
+request_memory = 1 MB
+request_disk = 1 MB
+
+# The last line of a submit file indicates how many jobs of the above
+#  description should be queued. We'll start with one job.
+queue 1
+
