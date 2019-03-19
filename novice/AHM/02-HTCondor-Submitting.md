@@ -9,19 +9,19 @@ title: 	Job Scheduling with HTCondor
 *   Learn how to submit HTCondor Jobs.   
 *   Learn how to monitor the running Jobs.    
 </div> -->
-
+ 
 ## Overview 
 In this section, we will learn the basics of HTCondor for submitting and monitoring jobs. The jobs are submitted through the OSG Connect login node. The submitted jobs are executed on the remote worker node(s) and the outputs are transfered back to the login node. 
 
-![fig 1](https://raw.githubusercontent.com/OSGConnect/osg-ahm-17/novice/DHTC/Images/jobSubmit.png)
+![fig 1](/novice/AHM/Images/jobSubmit.png)
 
 ## Login to OSG Connect
 
-If you are still logged in from the previous lesson, you can continue to the next section. Otherwise, please login using SSH:
+ using SSH:
 
 ```
-# username is your username
-$ ssh username@training.osgconnect.net  
+# username is your CUE username
+$ ssh username@scosg16.jlab.org
 # enter your password
 password:                            
 ```
@@ -37,7 +37,7 @@ This is normal when connecting to a new host for the first time. If prompted, ty
 
 ## Job execution script
 
-Using the `tutorial` command, we will get the relevant example files. Run the `quickstart` tutorial:
+Use the command below to copy the tutorial files into your account:
 
 ```
 # creates a directory "tutorial-quickstart".
