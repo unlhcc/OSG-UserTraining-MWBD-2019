@@ -13,7 +13,7 @@ title: 	Job Scheduling with HTCondor
 ## Overview 
 In this section, we will learn the basics of HTCondor for submitting and monitoring jobs. The jobs are submitted through the OSG Connect login node. The submitted jobs are executed on the remote worker node(s) and the outputs are transfered back to the login node. 
 
-![fig 1](https://raw.githubusercontent.com/OSGConnect/osg-ahm-17/novice/DHTC/Images/jobSubmit.png)
+![fig 1](https://raw.githubusercontent.com/OSGConnect/tutorial-quickstart/Images/jobSubmit.png)
 
 ## Login to OSG Connect
 
@@ -167,16 +167,7 @@ $ condor_q -nobatch 1144.0
 
 Note the ST (state) column. Your job will be in the `I` state (idle) if it hasn't started yet. If it's currently scheduled and running, it will have state `R` (running). If it has completed already, it will not appear in `condor_q`.
 
-Let's wait for your job to finish – that is, for `condor_q` not to show the job in its output. A useful tool for this is watch – it runs a program repeatedly, letting you see how the output differs at fixed time intervals. Let's submit the job again, and watch condor_q output at two-second intervals:
-
-```
-$ condor_submit tutorial01.submit
-Submitting job(s). 
-1 job(s) submitted to cluster 1145
-$ watch -n2 condor_q username 
-```
-
-When your job has completed, it will disappear from the list.  To close watch, hold down Ctrl and press C.
+When your job has completed, it will disappear from the list.  
 
 ## Job history
 
