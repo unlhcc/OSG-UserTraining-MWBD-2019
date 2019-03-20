@@ -127,18 +127,17 @@ Submitting job(s).
 
 #### Check the job status
 
-The `condor_q` command tells the status of currently running jobs.
-Generally you will want to limit it to your own jobs: 
+The `condor_q` command tells the status of currently running jobs.  By default, 
+it should just show your jobs, although you can also use your username to show 
+only your jobs. 
 
 ``` console
 $ condor_q netid
 -- Schedd: login03.osgconnect.net : <192.170.227.22:9618?... @ 12/10/18 14:19:08
 OWNER	   BATCH_NAME     SUBMITTED   DONE   RUN    IDLE  TOTAL JOB_IDS
-netid	 ID: 1441271  12/10 14:18	 _	1      _      1 1441271.0
+username	 ID: 1441271  12/10 14:18	 _	1      _      1 1441271.0
 
-Total for query: 1 jobs; 0 completed, 0 removed, 0 idle, 1 running, 0 held, 0 suspended
-Total for netid: 1 jobs; 0 completed, 0 removed, 0 idle, 1 running, 0 held, 0 suspended
-Total for all users: 3001 jobs; 0 completed, 0 removed, 2189 idle, 754 running, 58 held, 0 suspended
+1 jobs; 0 completed, 0 removed, 0 idle, 1 running, 0 held, 0 suspended
 ```
 
 You can also get status on a specific job cluster: 
@@ -147,35 +146,15 @@ You can also get status on a specific job cluster:
 $ condor_q 1441271
 -- Schedd: login03.osgconnect.net : <192.170.227.22:9618?... @ 12/10/18 14:19:08
 OWNER	   BATCH_NAME     SUBMITTED   DONE   RUN    IDLE  TOTAL JOB_IDS
-netid	 ID: 1441271  12/10 14:18	 _	1      _      1 1441271.0
+username	 ID: 1441271  12/10 14:18	 _	1      _      1 1441271.0
 
-Total for query: 1 jobs; 0 completed, 0 removed, 0 idle, 1 running, 0 held, 0 suspended
-Total for netid: 1 jobs; 0 completed, 0 removed, 0 idle, 1 running, 0 held, 0 suspended
-Total for all users: 3001 jobs; 0 completed, 0 removed, 2189 idle, 754 running, 58 held, 0 suspended
+1 jobs; 0 completed, 0 removed, 0 idle, 1 running, 0 held, 0 suspended
 ```	
 
 Note the `DONE`, `RUN`, and `IDLE` columns. Your job will be listed in the `IDLE` column if
 it hasn't started yet. If it's currently scheduled and running, it will
 appear in the `RUN` column. As it finishes up, it will then show in the `DONE` column.
 Once the job completes completely, it will not appear in `condor_q`. 
-
-Let's wait for your job to finish – that is, for `condor_q` not to show
-the job in its output. A useful tool for this is watch – it runs a
-program repeatedly, letting you see how the output differs at fixed
-time intervals. Let's submit the job again, and watch `condor_q` output
-at two-second intervals: 
-
-``` console
-$ condor_submit tutorial01.submit
-Submitting job(s). 
-1 job(s) submitted to cluster 1441272
-$ watch -n2 condor_q netid 
-... 
-```
-
-When your job has completed, it will disappear from the list. 
-
-*Note*: To close watch, hold down Ctrl and press C. 
 
 #### Job history
 
