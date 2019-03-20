@@ -292,7 +292,7 @@ request_disk = 1 GB
 queue 1
 ```
 
-Notice the added `arguments = input.txt` information. The `arguements` option specifies what arguments should be passed to the executable. 
+Notice the added `arguments = input.txt` information. The `arguments` option specifies what arguments should be passed to the executable. 
 
 The `transfer_input_files` and `transfer_output_files` options need to be included as well.  When jobs are deployed on the Open Science Grid, they are sent only with files that are specified. Additionally, only the specified output files are returned with the job. **Any output not transferred back, with the exception of our `error`, `output`, and `log` files, are discarded at the end of the job.**
 
