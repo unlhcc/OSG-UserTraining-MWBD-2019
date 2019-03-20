@@ -1,15 +1,3 @@
----
-layout: lesson
-root: ../..
-title: 	Job Scheduling with HTCondor  
----
-<!-- <div class="objectives" markdown="1">
-
-#### Objectives
-*   Learn how to submit HTCondor Jobs.   
-*   Learn how to monitor the running Jobs.    
-</div> -->
- 
 ## Overview 
 In this section, we will learn the basics of HTCondor for submitting and monitoring jobs. The jobs are submitted through the OSG Connect login node. The submitted jobs are executed on the remote worker node(s) and the outputs are transfered back to the login node. 
 

@@ -1,20 +1,6 @@
----
-layout: lesson
-root: ../..
-title: Scaling Up
----
-<!-- <div class="objectives" markdown="1">
-
-#### Objectives
-*   Learn how to write an HTCondor submit script.
-*   Learn how to submit multiple jobs at once with HTCondor.
-*   Visualize how jobs distribute on OSG.
-
--->
-
 ### Overview
 
-In this section, we will learn how to quickly submit multiple jobs simultaneously using HTCondor and we will visualize where these jobs run so we can get an idea of where and jobs are distributed on the Open Science Grid.
+In this lesson, we will learn how to quickly submit multiple jobs simultaneously using HTCondor and we will visualize where these jobs run so we can get an idea of where and jobs are distributed on the Open Science Grid.
 
 ### Gathering network information from the OSG
 

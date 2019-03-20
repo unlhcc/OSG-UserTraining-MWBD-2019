@@ -1,16 +1,7 @@
----
-layout: lesson
-root: ../..
-title: Introduction to the Open Science Grid 
----
-<!-- <div class="objectives" markdown="1">
-
-#### Objectives
-*   Overview of the Open Science Grid consortium and available resources.
-*   Understand what computational is and isn't well-supported on the OSG.
-*   Begin working with OSG software modules and tutorials in preparation for remaining exercises.
-
-</div> -->
+# OSG Research Training
+2019 Joint HSF/OSG/WLCG Workshop HOW2019
+Thomas Jefferson Labs National Accelerator Facility
+Thursday March 21, 2019 - 9:00 AM
 
 ## The Open Science Grid
 
