@@ -1,7 +1,19 @@
+---
+layout: lesson
+root: ../..
+title: 	Job Scheduling with HTCondor  
+---
+<!-- <div class="objectives" markdown="1">
+
+#### Objectives
+*   Learn how to submit HTCondor Jobs.   
+*   Learn how to monitor the running Jobs.    
+</div> -->
+ 
 ## Overview 
 In this section, we will learn the basics of HTCondor for submitting and monitoring jobs. The jobs are submitted through the OSG Connect login node. The submitted jobs are executed on the remote worker node(s) and the outputs are transfered back to the login node. 
 
-![fig 1](/novice/AHM/Images/jobSubmit.png)
+![fig 1](https://raw.githubusercontent.com/OSGConnect/tutorial-quickstart/master/Images/jobSubmit.png)
 
 ## Login to OSG Connect
 
@@ -43,6 +55,7 @@ let's create a test script to execute as your job. For pretyped setup, this is
 the `short.sh` file: 
 
 ```  console
+$ cat short.sh
 #!/bin/bash
 # short.sh: a short discovery job
 printf "Start time: "; /bin/date
@@ -81,6 +94,7 @@ Science complete!
 So far, so good! Let's create a simple (if verbose) HTCondor submit file. This can be found in `tutorial01.submit`.
 
 ``` console
+$ cat tutorial01.submit
 # Our executable is the main program or script that we've created
 # to do the 'work' of a single job.
 executable = short.sh
@@ -115,18 +129,17 @@ Submitting job(s).
 
 #### Check the job status
 
-The `condor_q` command tells the status of currently running jobs.
-Generally you will want to limit it to your own jobs: 
+The `condor_q` command tells the status of currently running jobs.  By default, 
+it should just show your jobs, although you can also use your username to show 
+only your jobs. 
 
 ``` console
-$ condor_q netid
+$ condor_q username
 -- Schedd: login03.osgconnect.net : <192.170.227.22:9618?... @ 12/10/18 14:19:08
 OWNER	   BATCH_NAME     SUBMITTED   DONE   RUN    IDLE  TOTAL JOB_IDS
-netid	 ID: 1441271  12/10 14:18	 _	1      _      1 1441271.0
+username	 ID: 1441271  12/10 14:18	 _	1      _      1 1441271.0
 
-Total for query: 1 jobs; 0 completed, 0 removed, 0 idle, 1 running, 0 held, 0 suspended
-Total for netid: 1 jobs; 0 completed, 0 removed, 0 idle, 1 running, 0 held, 0 suspended
-Total for all users: 3001 jobs; 0 completed, 0 removed, 2189 idle, 754 running, 58 held, 0 suspended
+1 jobs; 0 completed, 0 removed, 0 idle, 1 running, 0 held, 0 suspended
 ```
 
 You can also get status on a specific job cluster: 
@@ -135,35 +148,15 @@ You can also get status on a specific job cluster:
 $ condor_q 1441271
 -- Schedd: login03.osgconnect.net : <192.170.227.22:9618?... @ 12/10/18 14:19:08
 OWNER	   BATCH_NAME     SUBMITTED   DONE   RUN    IDLE  TOTAL JOB_IDS
-netid	 ID: 1441271  12/10 14:18	 _	1      _      1 1441271.0
+username	 ID: 1441271  12/10 14:18	 _	1      _      1 1441271.0
 
-Total for query: 1 jobs; 0 completed, 0 removed, 0 idle, 1 running, 0 held, 0 suspended
-Total for netid: 1 jobs; 0 completed, 0 removed, 0 idle, 1 running, 0 held, 0 suspended
-Total for all users: 3001 jobs; 0 completed, 0 removed, 2189 idle, 754 running, 58 held, 0 suspended
+1 jobs; 0 completed, 0 removed, 0 idle, 1 running, 0 held, 0 suspended
 ```	
 
 Note the `DONE`, `RUN`, and `IDLE` columns. Your job will be listed in the `IDLE` column if
 it hasn't started yet. If it's currently scheduled and running, it will
 appear in the `RUN` column. As it finishes up, it will then show in the `DONE` column.
 Once the job completes completely, it will not appear in `condor_q`. 
-
-Let's wait for your job to finish – that is, for `condor_q` not to show
-the job in its output. A useful tool for this is watch – it runs a
-program repeatedly, letting you see how the output differs at fixed
-time intervals. Let's submit the job again, and watch `condor_q` output
-at two-second intervals: 
-
-``` console
-$ condor_submit tutorial01.submit
-Submitting job(s). 
-1 job(s) submitted to cluster 1441272
-$ watch -n2 condor_q netid 
-... 
-```
-
-When your job has completed, it will disappear from the list. 
-
-*Note*: To close watch, hold down Ctrl and press C. 
 
 #### Job history
 
@@ -206,17 +199,13 @@ Science complete!
 Sometimes it's useful to pass arguments to your executable from your
 submit file. For example, you might want to use the same job script
 for more than one run, varying only the parameters. You can do that
-by adding Arguments to your submission file.
+by adding arguments to your submission file.
 
-First, let's edit our existing `short.sh` script to accept arguments. To avoid losing our original script, we make a copy of the file under the name `short_transfer.sh`
-
-``` console
-$ cp short.sh short_transfer.sh
-```
-	
-Now, edit the file to include the added lines below:
+We have modified our existing `short.sh` script to accept arguments. We can 
+see these changes in the `short_transfer.sh`
 
 ``` console
+$ cat short_transfer.sh
 #!/bin/bash
 # short.sh: a short discovery job
 printf "Start time: "; /bin/date
@@ -240,9 +229,10 @@ $ chmod +x short_transfer.sh
 
 Notice that with our changes, the new script will now print out the contents of whatever file we specify in our arguments, specified by the `$1`. It will also copy the contents of that file into another file called `output.txt`.
 
-Make a simple text file called `input.txt` that we can pass to our script:
+We have a simple text file called `input.txt` that we can pass to our script:
 
 ``` file
+$ cat input.txt
 "Hello World"
 ```
 
@@ -267,9 +257,11 @@ drwxrwxr-x 2 netid users  114 Dec 11 09:50 log
 Science complete!
 ```
 
-Now, let's edit our submit file to properly handle these new arguments and output files and save this as `tutorial02.submit`
+Now, we need to edit our submit file to properly handle these new arguments and output files. 
+This is saved as `tutorial02.submit`
 
 ``` console
+$ cat tutorial02.submit
 # We need the job to run our executable script, with the
 #  input.txt filename as an argument, and to transfer the
 #  relevant input and output files:
@@ -316,6 +308,7 @@ directory really messy with a large number of jobs, let's tell HTCondor
 to put the files in a directory called log. Here's what the third submit file looks like, called `tutorial03.submit`:
 
 ``` console
+$ cat tutorial03.submit
 # We need the job to run our executable script, arguments and files.
 #  Also, we'll specify unique filenames for each job by using
 #  the job's 'cluster' value.
