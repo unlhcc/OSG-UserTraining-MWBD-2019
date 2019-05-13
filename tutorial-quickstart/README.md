@@ -375,28 +375,14 @@ the slot name and look only at hostnames. We'll cut again on the period
 in the hostname to grab the domain where the job ran.
 
 For illustration, the author has submitted a thousand jobs for a more
-interesting distribution output.
+interesting output.
 
-	$ condor_history -format '%s\n' LastRemoteHost 942 | cut -d@ -f2 | distribution --height=100
-	Val                    |Ct (Pct)     Histogram
-	[netid@login01 log]$ condor_history -format '%s\n' LastRemoteHost 959 | cut -d@ -f2 | cut -d. -f2,3 | distribution --height=100
-	Val          |Ct (Pct)     Histogram
-	mwt2.org     |456 (46.77%) +++++++++++++++++++++++++++++++++++++++++++++++++++++
-	uchicago.edu |422 (43.28%) +++++++++++++++++++++++++++++++++++++++++++++++++
-	local        |28 (2.87%)   ++++
-	t2.ucsd      |23 (2.36%)   +++
-	phys.uconn   |12 (1.23%)   ++
-	tusker.hcc   |10 (1.03%)   ++
+	$ condor_history -format '%s\n' LastRemoteHost 942 | cut -d@ -f2 | sort | uniq -c
+      4 acas0886.usatlas.bnl.gov
+      1 acas0946.usatlas.bnl.gov
+      2 acas1095.usatlas.bnl.gov
+      3 acas1099.usatlas.bnl.gov
 	...
-
-The distribution program reduces a list of hostnames to a set of
-hostnames with no duplication (much like `sort | uniq -c`), but
-additionally plots a distribution histogram on your terminal
-window. This is nice for seeing how Condor selected your execution
-endpoints.
-
-There is also `condor_plot` a command that plots similar information in a
-HTML page. You can have bar plots, pie charts and more.
 
 ## Removing jobs
 
