@@ -6,9 +6,9 @@ arguments = input.txt
 transfer_input_files = input.txt
 transfer_output_files = output.txt
 
-error = job.error
-output = job.output
-log = job.log
+error = job2.error
+output = job2.output
+log = job2.log
 
 # The below are good base requirements for first testing jobs on OSG, 
 #  if you don't have a good idea of memory and disk usage.
