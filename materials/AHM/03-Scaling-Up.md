@@ -55,7 +55,7 @@ except AttributeError:
 You will be using `location-wrapper.sh` as your executable and `wn-geoip.tar.gz` as an input file.
 
 The submit file for this job, `scalingup.submit`, is setup to specify these files and
-submit **fifty** jobs simultaneously. It also uses the job's `process` value to create unique output, error and log files for each of the job.
+submit **fifty** jobs simultaneously. It also uses the job's `$(Process)` value to create unique output, error and log files for each of the job.
 
 ``` console
 $ cat scalingup.submit
