@@ -21,15 +21,15 @@ In this section, we will learn the basics of HTCondor for submitting and monitor
 
 ``` console
 # username is your CUE username
-$ ssh username@scosg16.jlab.org
+$ ssh username@training.osgconnect.net
 # enter your password
 password:                            
 ```
 
 You may receive a warning such as:
 ``` console
-The authenticity of host 'scosg16.jlab.org (192.170.227.119)' can't be established.
-RSA key fingerprint is SHA256:KRH0+kF1V5kNookplCt2f+lH4dKaZLowKbEevNnVmKY.
+The authenticity of host 'training.osgconnect.net (128.135.158.220)' can't be established.
+ECDSA key fingerprint is SHA256:gielJSpIiZisxGna5ocHtiK+0zAqFTdcEkLBOgnDUsg.
 Are you sure you want to continue connecting (yes/no)?
 ```
 
