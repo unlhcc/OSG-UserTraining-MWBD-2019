@@ -423,7 +423,13 @@ constraints.
 
 ## Excercises
 
-
+> ## Process numbers
+> If a submit file had `queue 100` at the end, what would be the range of process numbers?
+> * 1-101
+> * 0-100
+> * 1-100
+> * 0-99
+{: .challenge}
 
 
 
