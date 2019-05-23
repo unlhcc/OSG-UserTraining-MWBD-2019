@@ -40,19 +40,17 @@ This is normal when connecting to a new host for the first time. If prompted, ty
 Use the command below to copy the tutorial files into your account:
 
 ``` console
-# creates a directory "OSG-UserTraining-JLab-2019"
-$ git clone https://github.com/swc-osg-workshop/OSG-UserTraining-JLab-2019/
-# enter the "OSG-UserTraining-JLab-2019" directory
-$ cd OSG-UserTraining-JLab-2019
+# creates a directory "OSG-UserTraining-MWBD-2019"
+$ git clone https://github.com/unlhcc/OSG-UserTraining-MWBD-2019.git
+# enter the "OSG-UserTraining-MWBD-2019" directory
+$ cd OSG-UserTraining-MWBD-2019
 # entering the "tutorial-quickstart" directory
 $ cd tutorial-quickstart
 ```
 
 ### Job 1: A simple, nonparallel job
 
-Inside the tutorial directory that you created or installed previously,
-let's create a test script to execute as your job. For pretyped setup, this is
-the `short.sh` file: 
+Inside the tutorial directory that you just created, find a test script to execute as your job. Look at the `short.sh` file: 
 
 ```  console
 $ cat short.sh
@@ -81,10 +79,11 @@ of HTCondor before submitting into the grid.
 
 ``` console
 $ ./short.sh
-Start time: Wed Aug 21 09:21:35 CDT 2013
-Job is running on node: login01.osgconnect.net
-Job running as user: uid=54161(netid) gid=1000(users) groups=1000(users),0(root),1001(osg-connect),1002(osg-staff),1003(osg-connect-test),9948(staff),19012(osgconnect)
-Job is running in directory: /home/netid/quickstart
+Start time: Thu May 23 00:07:53 UTC 2019
+Job is running on node: training.osgconnect.net
+Job running as user: uid=19826(dweitzel) gid=1000(centos) groups=1000(centos),20024(osg.ConnectTrain) context=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
+Job is running in directory: /home/dweitzel/OSG-UserTraining-MWBD-2019/tutorial-quickstart
+
 Working hard...
 Science complete!
 ```
@@ -134,7 +133,7 @@ it should just show your jobs, although you can also use your username to show
 only your jobs. 
 
 ``` console
-$ condor_q username
+$ condor_q
 -- Schedd: login03.osgconnect.net : <192.170.227.22:9618?... @ 12/10/18 14:19:08
 OWNER	   BATCH_NAME     SUBMITTED   DONE   RUN    IDLE  TOTAL JOB_IDS
 username	 ID: 1441271  12/10 14:18	 _	1      _      1 1441271.0
@@ -185,9 +184,9 @@ Read the output file. It should be something like this:
 
 ```
 $ cat short.output
-Start time: Mon Dec 10 20:18:56 UTC 2018
-Job is running on node: osg-84086-0-cmswn2030.fnal.gov
-Job running as user: uid=12740(osg) gid=9652(osg) groups=9652(osg)
+Start time: Thu May 23 00:09:54 UTC 2019
+Job is running on node: iut2-c228.iu.edu
+Job running as user: uid=21039(osg) gid=21000(osgvo) groups=21000(osgvo)
 Job is running in directory: /srv
 
 Working hard...
@@ -240,20 +239,27 @@ Once again, before submitting our job we should test it locally to ensure it run
 
 ``` console
 $ ./short_transfer.sh input.txt
-Start time: Tue Dec 11 10:19:12 CST 2018
-Job is running on node: login03.osgconnect.net
-Job running as user: uid=100279(netid) gid=1000(users) groups=1000(users),5532(connect),5782(osg),7021(osg.ConnectTrain)
-Job is running in directory: /home/netid/tutorial-quickstart
-The command line argument is: Contents of input.txt is "Hello World"Working hard...total 28
-drwxrwxr-x 2 netid users   34 Oct 15 09:37 Images
--rw-rw-r-- 1 netid users   13 Oct 15 09:37 input.txt
-drwxrwxr-x 2 netid users  114 Dec 11 09:50 log
--rw-r--r-- 1 netid users   13 Dec 11 10:19 output.txt
--rwxrwxr-x 1 netid users  291 Oct 15 09:37 short.sh
--rwxrwxr-x 1 netid users  390 Dec 11 10:18 short_transfer.sh
--rw-rw-r-- 1 netid users  806 Oct 15 09:37 tutorial01.submit
--rw-rw-r-- 1 netid users  547 Dec 11 09:49 tutorial02.submit
--rw-rw-r-- 1 netid users 1321 Oct 15 09:37 tutorial03.submit
+Start time: Thu May 23 00:12:29 UTC 2019
+Job is running on node: training.osgconnect.net
+Job running as user: uid=19826(dweitzel) gid=1000(centos) groups=1000(centos),20024(osg.ConnectTrain) context=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
+Job is running in directory: /home/dweitzel/OSG-UserTraining-MWBD-2019/tutorial-quickstart
+The command line argument is: Contents of input.txt is "Hello World"
+
+Working hard...
+total 52
+drwxr-xr-x. 2 dweitzel centos    27 May 23 00:06 Images
+-rw-r--r--. 1 dweitzel centos    14 May 23 00:12 input.txt
+drwxr-xr-x. 2 dweitzel centos    24 May 23 00:06 log
+-rw-r--r--. 1 dweitzel centos    14 May 23 00:12 output.txt
+-rw-r--r--. 1 dweitzel centos 14312 May 23 00:06 README.md
+-rw-r--r--. 1 dweitzel centos     0 May 23 00:10 short.error
+-rw-r--r--. 1 dweitzel centos  1270 May 23 00:10 short.log
+-rw-r--r--. 1 dweitzel centos   224 May 23 00:10 short.output
+-rwxr-xr-x. 1 dweitzel centos   289 May 23 00:06 short.sh
+-rwxr-xr-x. 1 dweitzel centos   401 May 23 00:06 short_transfer.sh
+-rw-r--r--. 1 dweitzel centos   687 May 23 00:06 tutorial01.submit
+-rw-r--r--. 1 dweitzel centos   570 May 23 00:06 tutorial02.submit
+-rw-r--r--. 1 dweitzel centos   535 May 23 00:06 tutorial03.submit
 Science complete!
 ```
 
@@ -270,9 +276,9 @@ arguments = input.txt
 transfer_input_files = input.txt
 transfer_output_files = output.txt
 
-error = job.error
-output = job.output
-log = job.log
+error = job2.error
+output = job2.output
+log = job2.log
 
 # The below are good base requirements for first testing jobs on OSG, 
 #  if you don't have a good idea of memory and disk usage.
@@ -295,7 +301,9 @@ $ condor_submit tutorial02.submit
 Submitting job(s).
 1 job(s) submitted to cluster 1444781.
 ```	
-	
+
+Check the job again with `condor_q`.  When the job completes check the `ouptut.txt` as well as `job2.output`.  Does the job2.output have the expected output?
+
 
 ### Job 3: Submitting jobs concurrently
 
@@ -329,6 +337,15 @@ request_disk = 1 GB
 queue 10
 ```
 
+Notice how we used `$(Cluster)` and `$(Process)` in the name of the error and output files.  Those variables will be replaced when the job is submitted with the jobid in `$(Cluster)`, and `$(Process)` will increment.
+
+Also, we changed the last line from `queue 1` to `queue 10`.  This tell HTCondor to submit 10 jobs.
+
+| Variable | Behavior                                                                          | Example          |
+|----------|-----------------------------------------------------------------------------------|------------------|
+| Cluster  | A single value per `condor_submit`.                                               | 1059             |
+| Process  | A range of numbers from 0 to however many are specified in the `queue` statement. | 0, 1, 2, 3, 4... |
+
 Before submitting, we also need to make sure the log directory exists.
 
 ``` console
@@ -342,7 +359,9 @@ $ condor_submit tutorial03.submit
 Submitting job(s)..........
 10 job(s) submitted to cluster 1444786.
 ```
-	
+
+Monitor the progress of the jobs with `condor_q`.
+
 Look at the output files in the log directory and notice how each job received its own separate output file:
 
 ``` console
@@ -365,38 +384,26 @@ for your first job. Again the output is quite long:
 	DiskUsage_RAW = 36
 	... 
 
-Looking through here for a hostname, we can see that the parameter
-that we want to know is `LastRemoteHost`. That's what job slot our job
+Looking through here for a significant sitename, we can see that the parameter
+that we want to know is `MATCH_EXP_JOBGLIDEIN_ResourceName`. That's what job slot our job
 ran on. With that detail, we can construct a shell command to get
-the execution node for each of our 100 jobs, and we can plot the
-spread. LastRemoteHost normally combines a slot name and a host name,
-separated by an @ symbol, so we'll use the UNIX cut command to slice off
-the slot name and look only at hostnames. We'll cut again on the period
-in the hostname to grab the domain where the job ran.
+the execution node for each of our 10 jobs, and we can plot the
+spread.
 
-For illustration, the author has submitted a thousand jobs for a more
-interesting distribution output.
 
-	$ condor_history -format '%s\n' LastRemoteHost 942 | cut -d@ -f2 | distribution --height=100
-	Val                    |Ct (Pct)     Histogram
-	[netid@login01 log]$ condor_history -format '%s\n' LastRemoteHost 959 | cut -d@ -f2 | cut -d. -f2,3 | distribution --height=100
-	Val          |Ct (Pct)     Histogram
-	mwt2.org     |456 (46.77%) +++++++++++++++++++++++++++++++++++++++++++++++++++++
-	uchicago.edu |422 (43.28%) +++++++++++++++++++++++++++++++++++++++++++++++++
-	local        |28 (2.87%)   ++++
-	t2.ucsd      |23 (2.36%)   +++
-	phys.uconn   |12 (1.23%)   ++
-	tusker.hcc   |10 (1.03%)   ++
-	...
+	$ condor_history -format '%s\n' MATCH_EXP_JOBGLIDEIN_ResourceName 7 | distribution --height=10
+	Val          |Ct (Pct)   Histogram
+	MWT2         |5 (50.00%) +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	IIT_CE1      |3 (30.00%) +++++++++++++++++++++++++++++++++
+	UColorado_HEP|1 (10.00%) +++++++++++
+	SU-ITS-CE2   |1 (10.00%) +++++++++++
+
 
 The distribution program reduces a list of hostnames to a set of
 hostnames with no duplication (much like `sort | uniq -c`), but
 additionally plots a distribution histogram on your terminal
 window. This is nice for seeing how Condor selected your execution
 endpoints.
-
-There is also `condor_plot` a command that plots similar information in a
-HTML page. You can have bar plots, pie charts and more.
 
 ## Removing jobs
 
@@ -413,3 +420,12 @@ the jobs in the job submission and `condor_rm [username]` will remove
 all jobs belonging to the user. The `condor_rm` documenation has more
 details on using `condor_rm` including ways to remove jobs based on other
 constraints.
+
+## Excercises
+
+
+
+
+
+
+
