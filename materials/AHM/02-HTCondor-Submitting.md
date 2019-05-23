@@ -423,13 +423,18 @@ constraints.
 
 ## Excercises
 
-> ## Process numbers
-> If a submit file had `queue 100` at the end, what would be the range of process numbers?
-> * 1-101
-> * 0-100
-> * 1-100
-> * 0-99
-{: .challenge}
+### Process numbers
+If a submit file had `queue 100` at the end, what would be the range of process numbers?
+* 1-101
+* 0-100
+* 1-100
+* 0-99
+
+### Write to separate outputs
+You may have noticed that all of the outputs from `tutorial03.submit` wrote to the same `output.txt`.  Modify submit and `short_transfer.sh` scripts to write to a different file each time.
+
+Modify the `tutorial03.submit` to pass `$(Process)` as an argument to the `short_transfer.sh` script.  Also, add the new output file to the `transfer_output_files`.  Modify `short_transfer.sh` to use argument `$2` to name the `output.txt` file.
+
 
 
 
